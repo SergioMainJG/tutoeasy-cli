@@ -1,3 +1,4 @@
+<<<<<<< README.md
 # TutoEasy
 
 ## Sumary
@@ -67,7 +68,7 @@ One of the benefits of our implementation of monolithic architecture with flavor
 Other benefit is in case we have the enough time to migrate Picocli to JavaFX/TornadoFX/GemsFX
 
 ````bash
-src
+cli.tutoeasy
 ├── main ## Here is the start point, the bootstrap of our application
 ├── config ## Here will be the connections with MySQL, get the envs or global config for all the project
 ├── model ## Here the entities for our Database
