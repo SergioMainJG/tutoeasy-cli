@@ -1,6 +1,6 @@
 package cli.tutoeasy.model.dto;
 
-public record CreateAdministradorDto(
+public record CreateAdministratorDto(
         String name,
         String lastName,
         String email,

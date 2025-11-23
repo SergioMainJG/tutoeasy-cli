@@ -4,7 +4,7 @@ import cli.tutoeasy.command.AdminCommand;
 import cli.tutoeasy.command.LoginCommand;
 import cli.tutoeasy.command.RootCommand;
 import cli.tutoeasy.repository.UserRepository;
-import cli.tutoeasy.service.AdministradorService;
+import cli.tutoeasy.service.AdministratorService;
 import cli.tutoeasy.service.AuthService;
 import picocli.CommandLine;
 
@@ -16,7 +16,7 @@ public class Main {
 
         UserRepository userRepo = new UserRepository();
        AuthService authService = new AuthService(userRepo);
-        AdministradorService adminService = new AdministradorService(userRepo);
+        AdministratorService adminService = new AdministratorService(userRepo);
 
        new CommandLine(new RootCommand())
                .addSubcommand("Login", new LoginCommand(authService))

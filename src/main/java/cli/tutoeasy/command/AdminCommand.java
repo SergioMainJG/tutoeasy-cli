@@ -1,12 +1,12 @@
 package cli.tutoeasy.command;
 
-import cli.tutoeasy.model.dto.CreateAdministradorDto;
-import cli.tutoeasy.service.AdministradorService;
+import cli.tutoeasy.model.dto.CreateAdministratorDto;
+import cli.tutoeasy.service.AdministratorService;
 import picocli.CommandLine.*;
 
 @Command(
         name = "create-admin",
-        description = "Registra un nuevo administrador",
+        description = "Register a new administrator",
         mixinStandardHelpOptions = true
 )
 public class AdminCommand implements Runnable {
@@ -23,19 +23,19 @@ public class AdminCommand implements Runnable {
     @Option(names = "--password", required = true, interactive = true)
     private String password;
 
-    private final AdministradorService adminService;
+    private final AdministratorService adminService;
 
-    public AdminCommand(AdministradorService adminService) {
+    public AdminCommand(AdministratorService adminService) {
         this.adminService = adminService;
     }
 
     @Override
     public void run() {
         try {
-            CreateAdministradorDto dto =
-                    new CreateAdministradorDto(name, lastName, email, password);
+            CreateAdministratorDto dto =
+                    new CreateAdministratorDto(name, lastName, email, password);
 
-            adminService.createAdministrador(dto);
+            adminService.createAdministrator(dto);
 
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
