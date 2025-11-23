@@ -1,29 +1,22 @@
 package cli.tutoeasy;
 
-import jakarta.persistence.EntityManager;
-import cli.tutoeasy.config.JPAUtil;
+import cli.tutoeasy.command.LoginCommand;
+import cli.tutoeasy.command.RootCommand;
+import cli.tutoeasy.repository.UserRepository;
+import cli.tutoeasy.service.AuthService;
+import picocli.CommandLine;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Intentando iniciar la conexión JPA/Hibernate...");
 
-        EntityManager em = null;
-        try {
-            em = JPAUtil.getEntityManager();
+        System.setProperty("java.util.logging.config.file",
+                ClassLoader.getSystemResource("logging.properties").getPath());
 
-            System.out.println("Conexión exitosa a la base de datos MySQL.");
+        UserRepository userRepo = new UserRepository();
+       AuthService authService = new AuthService(userRepo);
 
-
-        } catch (Exception e) {
-            System.err.println("Fallo en la conexión o inicialización de Hibernate.");
-            e.printStackTrace();
-        } finally {
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
-            JPAUtil.shutdown();
-        }
-
-        System.out.println("Aplicación terminada.");
+       new CommandLine(new RootCommand())
+               .addSubcommand("Login", new LoginCommand(authService))
+               .execute(args);
     }
 }
