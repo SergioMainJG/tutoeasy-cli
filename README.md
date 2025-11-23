@@ -68,7 +68,7 @@ Other benefit is in case we have the enough time to migrate Picocli to JavaFX/To
 
 ````bash
 cli.tutoeasy
-├── main ## Here is the start point, the bootstrap of our application
+├ Main.java ## Here is the start point, the bootstrap of our application
 ├── config ## Here will be the connections with MySQL, get the envs or global config for all the project
 ├── model ## Here the entities for our Database
 ├── repository ## Here the management with Hibernate 
