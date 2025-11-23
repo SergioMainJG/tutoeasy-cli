@@ -1,4 +1,3 @@
-<<<<<<< README.md
 # TutoEasy
 
 ## Sumary

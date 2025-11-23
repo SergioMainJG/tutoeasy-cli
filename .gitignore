@@ -38,6 +38,7 @@ build/
 ### Mac OS ###
 .DS_Store
 
+test
 .env
 .idea
 tutoeasy-mysql
