@@ -1,14 +1,15 @@
 services:
   tutoeasydb:
-    image: mysql:latest
+    image: mysql:8.0
     container_name: tutoeasydb
     restart: always
     ports:
-      - ${LOCAL_EXPOSED_PORT}:${MYSQL_EXPOSED_PORT}
+      - "${LOCAL_EXPOSED_PORT}:${MYSQL_EXPOSED_PORT}"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     volumes:
-      - ./tutoeasy-mysql:/var/lib/mysql
+      - ./tutoeasy-mariadb:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
