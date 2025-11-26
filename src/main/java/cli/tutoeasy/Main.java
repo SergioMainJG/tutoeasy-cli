@@ -19,7 +19,7 @@ public class Main {
         UserRepository userRepo = new UserRepository();
         AuthService authService = new AuthService(userRepo);
         StudentService studentService = new StudentService(userRepo);
-       AuthService authService = new AuthService(userRepo);
+        AuthService authService = new AuthService(userRepo);
         AdministratorService adminService = new AdministratorService(userRepo);
 
         new CommandLine(new RootCommand())
