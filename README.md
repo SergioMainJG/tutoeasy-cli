@@ -28,7 +28,7 @@ This projects can works in Java 17, but we suggest have installed for this proje
 __For this is required have an auth with gitlab and git in your local machine__
 
 - In a clean folder, you should to use:
-````sql
+````bash
 cd existing_repo
 git clone origin https://gitlab.com/jala-university1/cohort-6/ES.CSSD-113.GA.T2.25.M2/SC/capstone/team4/equipo4.git
 ````

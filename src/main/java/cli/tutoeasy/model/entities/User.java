@@ -3,6 +3,8 @@ package cli.tutoeasy.model.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Table(name = "Users")
 @Data
@@ -25,4 +27,7 @@ public class User {
     private Career career;
 
     private String description;
+
+    @OneToMany(mappedBy = "tutor")
+    private List<Tutoring> tutorings;
 }

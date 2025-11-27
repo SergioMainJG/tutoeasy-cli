@@ -11,5 +11,4 @@ services:
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     volumes:
-      - ./tutoeasy-mariadb:/var/lib/mysql
-      - ./db-init:/docker-entrypoint-initdb.d
+      - ./tutoeasy-mysql:/var/lib/mysql

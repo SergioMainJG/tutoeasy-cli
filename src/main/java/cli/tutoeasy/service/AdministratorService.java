@@ -1,6 +1,7 @@
 package cli.tutoeasy.service;
 
 import cli.tutoeasy.config.Argon2Util;
+import cli.tutoeasy.model.dto.ActionResponseDto;
 import cli.tutoeasy.model.dto.CreateAdministratorDto;
 import cli.tutoeasy.model.entities.User;
 import cli.tutoeasy.model.entities.UserRole;
@@ -13,12 +14,11 @@ public class AdministratorService {
         this.repo = repo;
     }
 
-    public void createAdministrator(CreateAdministratorDto dto) {
+    public ActionResponseDto createAdministrator(CreateAdministratorDto dto) {
 
         User existing = repo.findByEmail(dto.email());
         if (existing != null) {
-            System.out.println("There is already a registered administrator with that email address.");
-            return;
+            return new ActionResponseDto(false, "There is already a registered administrator with that email address.");
         }
 
         User admin = new User();
@@ -29,7 +29,7 @@ public class AdministratorService {
 
         repo.save(admin);
 
-        System.out.println("Administrator successfully registered.");
+        return new ActionResponseDto(true, "Administrator successfully registered.");
     }
 
     public User getAdminById(int id) {

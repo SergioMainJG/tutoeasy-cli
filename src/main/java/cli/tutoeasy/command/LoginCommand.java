@@ -23,6 +23,12 @@ public class LoginCommand implements Runnable {
     public void run() {
         LoginRequestDto req = new LoginRequestDto(email, password);
         var res = authService.login(req);
-        System.out.println(res.message());
+        if(res.userId() == -1){
+            String msg = Help.Ansi.AUTO.string("@|red Invalid username or password|@");
+            System.out.println(msg);
+            System.exit(0);
+        }
+        String msg = Help.Ansi.AUTO.string("@|green Welcome back,|@ @|blue "+  res.username() + "|@");
+        System.out.println(msg);
     }
 }

@@ -15,8 +15,18 @@
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
+
+        <!-- =======================
+         GSON to drive JSON
+    ======================== -->
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+
         <!-- =======================ff
                      DotEnv for reading the env
                 ======================== -->
