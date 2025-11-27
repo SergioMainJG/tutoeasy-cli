@@ -18,8 +18,8 @@ public class Main {
         System.setProperty("java.util.logging.config.file",
                 ClassLoader.getSystemResource("logging.properties").getPath());
 
-        UserRepository userRepo = new UserRepository();
-        AuthService authService = new AuthService(userRepo);
+        UserRepository userRepository = new UserRepository();
+        AuthService authService = new AuthService(userRepository);
         StudentService studentService = new StudentService(userRepo);
         TutorService tutorService = new TutorService(userRepo);
         AdministratorService adminService = new AdministratorService(userRepo);
