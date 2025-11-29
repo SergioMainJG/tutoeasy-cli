@@ -5,12 +5,58 @@
              version="2.2">
     <persistence-unit name="tutoeasy-cli" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <class>cli.tutoeasy.model.entities.User</class>
+        <class>cli.tutoeasy.model.entities.Career</class>
+        <class>cli.tutoeasy.model.entities.Subject</class>
+        <class>cli.tutoeasy.model.entities.Topic</class>
+        <class>cli.tutoeasy.model.entities.Tutoring</class>
+        <class>cli.tutoeasy.model.entities.TutorExpertise</class>
+        <class>cli.tutoeasy.model.entities.TutorSchedule</class>
+        <class>cli.tutoeasy.model.entities.Notification</class>
+
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+
+            <property name="hibernate.connection.provider_class"
+                      value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
+            <property name="hibernate.hikari.minimumIdle" value="5"/>
+            <property name="hibernate.hikari.maximumPoolSize" value="20"/>
+            <property name="hibernate.hikari.idleTimeout" value="300000"/>
+            <property name="hibernate.hikari.connectionTimeout" value="20000"/>
+            <property name="hibernate.hikari.maxLifetime" value="1200000"/>
+
+            <property name="hibernate.connection.pool_size" value="10"/>
+            <property name="hibernate.connection.autocommit" value="false"/>
+            <property name="hibernate.connection.release_mode" value="after_transaction"/>
+
+            <property name="hibernate.connection.provider_disables_autocommit" value="true"/>
+
+            <property name="hibernate.jdbc.batch_size" value="25"/>
+            <property name="hibernate.order_inserts" value="true"/>
+            <property name="hibernate.order_updates" value="true"/>
+            <property name="hibernate.jdbc.batch_versioned_data" value="true"/>
+
+            <property name="hibernate.query.plan_cache_max_size" value="2048"/>
+            <property name="hibernate.query.plan_parameter_metadata_max_size" value="128"/>
+            <property name="hibernate.query.in_clause_parameter_padding" value="true"/>
+
+            <property name="hibernate.max_fetch_depth" value="3"/>
+            <property name="hibernate.default_batch_fetch_size" value="16"/>
+
+            <property name="hibernate.temp.use_jdbc_metadata_defaults" value="false"/>
+
             <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.format_sql" value="false"/>
+            <property name="hibernate.use_sql_comments" value="false"/>
+
+            <property name="hibernate.jdbc.time_zone" value="UTC"/>
+
+            <property name="hibernate.generate_statistics" value="false"/>
         </properties>
     </persistence-unit>
 </persistence>
