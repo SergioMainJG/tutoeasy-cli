@@ -1,4 +1,4 @@
-package cli.tutoeasy.config;
+package cli.tutoeasy.config.argon2;
 
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
@@ -7,13 +7,38 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+/**
+ * Utility class for hashing and verifying passwords using the Argon2 algorithm.
+ * This class provides methods for creating a password hash and verifying a password against a given hash.
+ */
 public class Argon2Util {
+    /**
+     * The length of the salt in bytes.
+     */
     private static final int SALT_LENGTH = 16;
+    /**
+     * The length of the hash in bytes.
+     */
     private static final int HASH_LENGTH = 32;
+    /**
+     * The number of iterations to use for the Argon2 algorithm.
+     */
     private static final int ITERATIONS = 3;
+    /**
+     * The memory cost in kilobytes.
+     */
     private static final int MEMORY_KB = 65536; // 64MB
+    /**
+     * The degree of parallelism to use for the Argon2 algorithm.
+     */
     private static final int PARALLELISM = 1;
 
+    /**
+     * Hashes a password using the Argon2 algorithm.
+     *
+     * @param password The password to hash.
+     * @return The hashed password in the PHC string format.
+     */
     public static String hashingPassword(String password) {
         byte[] salt = new byte[SALT_LENGTH];
         new SecureRandom().nextBytes(salt);
@@ -36,6 +61,13 @@ public class Argon2Util {
                 + "$" + Base64.getEncoder().encodeToString(hash);
     }
 
+    /**
+     * Verifies a password against a PHC string hash.
+     *
+     * @param password The password to verify.
+     * @param phc      The PHC string hash to verify against.
+     * @return {@code true} if the password matches the hash, {@code false} otherwise.
+     */
     public static boolean verifyPassword(String password, String phc) {
         try {
             String[] parts = phc.split("\\$");
