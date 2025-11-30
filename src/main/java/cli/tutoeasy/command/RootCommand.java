@@ -5,7 +5,7 @@ import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.session.LogoutCommand;
 import cli.tutoeasy.command.student.StudentCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
-import cli.tutoeasy.command.tutor.TutorRequestsCommand;
+import cli.tutoeasy.command.tutor.TutorRequestCommand;
 import cli.tutoeasy.config.session.AuthSession;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -24,14 +24,14 @@ import picocli.CommandLine.Command;
                 StudentCommand.class,
                 TutorCommand.class,
                 AdminCommand.class,
-                TutorRequestsCommand.class
+                TutorRequestCommand.class
         },
         mixinStandardHelpOptions = true
 )
 public class RootCommand implements Runnable {
     /**
      * The main entry point for the root command execution.
-     * This method displays the current session status and provides guidance on how to proceed.
+     * This method displays the current session status and provides gsuidance on how to proceed.
      */
     @Override
     public void run() {
