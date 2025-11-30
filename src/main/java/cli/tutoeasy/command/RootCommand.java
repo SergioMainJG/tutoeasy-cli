@@ -31,7 +31,7 @@ import picocli.CommandLine.Command;
 public class RootCommand implements Runnable {
     /**
      * The main entry point for the root command execution.
-     * This method displays the current session status and provides gsuidance on how to proceed.
+     * This method displays the current session status and provides guidance on how to proceed.
      */
     @Override
     public void run() {
