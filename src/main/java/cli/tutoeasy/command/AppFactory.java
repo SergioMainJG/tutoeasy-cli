@@ -2,11 +2,13 @@ package cli.tutoeasy.command;
 
 import cli.tutoeasy.command.admin.AdminCommand;
 import cli.tutoeasy.command.global.ContactCommand;
+import cli.tutoeasy.command.global.MessageCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.student.StudentCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
 import cli.tutoeasy.repository.ContactRepository;
+import cli.tutoeasy.repository.MessageRepository;
 import cli.tutoeasy.repository.TutorRepository;
 import cli.tutoeasy.repository.TutoringRepository;
 import cli.tutoeasy.repository.UserRepository;
@@ -41,9 +43,9 @@ public class AppFactory implements CommandLine.IFactory {
      */
     private final ContactRepository contactRepository;
     /**
-     * The service for user-related operations.
+     * The repository for managing message data.
      */
-    private final UserService userService;
+    private final MessageRepository messageRepository;
     /**
      * The service for student-related operations.
      */
@@ -65,6 +67,8 @@ public class AppFactory implements CommandLine.IFactory {
      */
     private final ContactService contactService;
 
+    private final MessageService messageService;
+
     /**
      * Constructs a new instance of the {@code AppFactory}.
      * This constructor initializes all the repositories and services required by
@@ -76,12 +80,13 @@ public class AppFactory implements CommandLine.IFactory {
         this.tutorRepository = new TutorRepository();
         this.tutoringRepository = new TutoringRepository();
         this.contactRepository = new ContactRepository();
-        this.userService = new UserService(userRepository);
+        this.messageRepository = new MessageRepository();
         this.authService = new AuthService(userRepository);
         this.studentService = new StudentService(userRepository);
         this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository);
         this.adminService = new AdministratorService(userRepository);
         this.contactService = new ContactService(contactRepository, tutoringRepository);
+        this.messageService = new MessageService(messageRepository, contactRepository);
     }
 
     /**
@@ -120,6 +125,10 @@ public class AppFactory implements CommandLine.IFactory {
 
         if (cls == ContactCommand.class) {
             return (K) new ContactCommand(contactService);
+        }
+
+        if (cls == MessageCommand.class) {
+            return (K) new MessageCommand(messageService);
         }
 
         return cls.getDeclaredConstructor().newInstance();

@@ -13,6 +13,7 @@
         <class>cli.tutoeasy.model.entities.Tutoring</class>
         <class>cli.tutoeasy.model.entities.TutorExpertise</class>
         <class>cli.tutoeasy.model.entities.TutorSchedule</class>
+        <class>cli.tutoeasy.model.entities.Message</class>
         <class>cli.tutoeasy.model.entities.Notification</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>

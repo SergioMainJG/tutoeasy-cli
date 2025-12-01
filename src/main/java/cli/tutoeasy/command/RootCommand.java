@@ -2,6 +2,7 @@ package cli.tutoeasy.command;
 
 import cli.tutoeasy.command.admin.AdminCommand;
 import cli.tutoeasy.command.global.ContactCommand;
+import cli.tutoeasy.command.global.MessageCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.session.LogoutCommand;
 import cli.tutoeasy.command.student.StudentCommand;
@@ -24,7 +25,8 @@ import picocli.CommandLine.Command;
         TutorCommand.class,
         AdminCommand.class,
         TutorRequestCommand.class,
-        ContactCommand.class
+        ContactCommand.class,
+        MessageCommand.class
 }, mixinStandardHelpOptions = true)
 public class RootCommand implements Runnable {
     /**
