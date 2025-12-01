@@ -5,7 +5,7 @@ import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.session.LogoutCommand;
 import cli.tutoeasy.command.student.StudentCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
-import cli.tutoeasy.command.tutor.TutorRequestsCommand;
+import cli.tutoeasy.command.tutor.TutorRequestCommand;
 import cli.tutoeasy.config.session.AuthSession;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -24,7 +24,7 @@ import picocli.CommandLine.Command;
                 StudentCommand.class,
                 TutorCommand.class,
                 AdminCommand.class,
-                TutorRequestsCommand.class
+                TutorRequestCommand.class
         },
         mixinStandardHelpOptions = true
 )

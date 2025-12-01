@@ -4,7 +4,7 @@ import cli.tutoeasy.command.admin.AdminCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.student.StudentCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
-import cli.tutoeasy.command.tutor.TutorRequestsCommand;
+import cli.tutoeasy.command.tutor.TutorRequestCommand;
 import cli.tutoeasy.repository.TutorRepository;
 import cli.tutoeasy.repository.TutoringRepository;
 import cli.tutoeasy.repository.UserRepository;
@@ -96,8 +96,8 @@ public class AppFactory implements CommandLine.IFactory {
             return (K) new TutorCommand(tutorService);
         }
 
-        if (cls == TutorRequestsCommand.class) {
-            return (K) new TutorRequestsCommand(tutorService);
+        if (cls == TutorRequestCommand.class) {
+            return (K) new TutorRequestCommand(tutorService);
         }
 
         if(cls == StudentCommand.class ){
