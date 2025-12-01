@@ -1,10 +1,14 @@
 package cli.tutoeasy.command;
 
 import cli.tutoeasy.command.admin.AdminCommand;
+import cli.tutoeasy.command.global.ContactCommand;
+import cli.tutoeasy.command.global.MessageCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.student.StudentCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
+import cli.tutoeasy.repository.ContactRepository;
+import cli.tutoeasy.repository.MessageRepository;
 import cli.tutoeasy.repository.TutorRepository;
 import cli.tutoeasy.repository.TutoringRepository;
 import cli.tutoeasy.repository.UserRepository;
@@ -15,7 +19,8 @@ import picocli.CommandLine;
  * A factory for creating instances of commands and their dependencies.
  * This class is responsible for instantiating and wiring together the various
  * services and repositories required by the application's commands.
- * It implements the {@link CommandLine.IFactory} interface to integrate with the picocli framework.
+ * It implements the {@link CommandLine.IFactory} interface to integrate with
+ * the picocli framework.
  *
  * @see CommandLine.IFactory
  */
@@ -34,9 +39,13 @@ public class AppFactory implements CommandLine.IFactory {
      */
     private final TutoringRepository tutoringRepository;
     /**
-     * The service for user-related operations.
+     * The repository for managing contact data.
      */
-    private final UserService userService;
+    private final ContactRepository contactRepository;
+    /**
+     * The repository for managing message data.
+     */
+    private final MessageRepository messageRepository;
     /**
      * The service for student-related operations.
      */
@@ -53,28 +62,38 @@ public class AppFactory implements CommandLine.IFactory {
      * The service for authentication-related operations.
      */
     private final AuthService authService;
+    /**
+     * The service for contact-related operations.
+     */
+    private final ContactService contactService;
+
+    private final MessageService messageService;
 
     /**
      * Constructs a new instance of the {@code AppFactory}.
-     * This constructor initializes all the repositories and services required by the application.
+     * This constructor initializes all the repositories and services required by
+     * the application.
      */
     public AppFactory() {
 
         this.userRepository = new UserRepository();
         this.tutorRepository = new TutorRepository();
         this.tutoringRepository = new TutoringRepository();
-        this.userService = new UserService(userRepository);
+        this.contactRepository = new ContactRepository();
+        this.messageRepository = new MessageRepository();
         this.authService = new AuthService(userRepository);
         this.studentService = new StudentService(userRepository);
         this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository);
         this.adminService = new AdministratorService(userRepository);
-
+        this.contactService = new ContactService(contactRepository, tutoringRepository);
+        this.messageService = new MessageService(messageRepository, contactRepository);
     }
 
     /**
      * Creates an instance of the specified class.
      * This method is called by picocli to instantiate commands.
-     * It uses dependency injection to provide the necessary services to the commands.
+     * It uses dependency injection to provide the necessary services to the
+     * commands.
      *
      * @param cls The class to instantiate.
      * @param <K> The type of the class to instantiate.
@@ -100,8 +119,16 @@ public class AppFactory implements CommandLine.IFactory {
             return (K) new TutorRequestCommand(tutorService);
         }
 
-        if(cls == StudentCommand.class ){
+        if (cls == StudentCommand.class) {
             return (K) new StudentCommand(studentService);
+        }
+
+        if (cls == ContactCommand.class) {
+            return (K) new ContactCommand(contactService);
+        }
+
+        if (cls == MessageCommand.class) {
+            return (K) new MessageCommand(messageService);
         }
 
         return cls.getDeclaredConstructor().newInstance();
