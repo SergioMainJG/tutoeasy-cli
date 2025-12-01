@@ -86,13 +86,13 @@ public class TutorRequestCommand implements Runnable {
     @Override
     public void run() {
         if (!AuthSession.isLoggedIn()) {
-            String msg = CommandLine.Help.Ansi.AUTO.string("@|red ✗ You must be logged in to use this command.|@");
+            String msg = CommandLine.Help.Ansi.AUTO.string("@|red You must be logged in to use this command.|@");
             System.out.println(msg);
             return;
         }
 
         if (!AuthSession.hasRole("tutor")) {
-            String msg = CommandLine.Help.Ansi.AUTO.string("@|red ✗ Access denied. Only tutors can manage requests.|@");
+            String msg = CommandLine.Help.Ansi.AUTO.string("@|red Access denied. Only tutors can manage requests.|@");
             System.out.println(msg);
             return;
         }
@@ -103,10 +103,10 @@ public class TutorRequestCommand implements Runnable {
         if (acceptId != null) {
             var res = tutorService.accept(tutorId, acceptId);
             if (res.success()) {
-                String msg = CommandLine.Help.Ansi.AUTO.string("@|green ✓ " + res.message() + "|@");
+                String msg = CommandLine.Help.Ansi.AUTO.string("@|green " + res.message() + "|@");
                 System.out.println(msg);
             } else {
-                String msg = CommandLine.Help.Ansi.AUTO.string("@|red ✗ " + res.message() + "|@");
+                String msg = CommandLine.Help.Ansi.AUTO.string("@|red " + res.message() + "|@");
                 System.out.println(msg);
             }
             return;
@@ -115,10 +115,10 @@ public class TutorRequestCommand implements Runnable {
         if (rejectId != null) {
             var res = tutorService.reject(tutorId, rejectId);
             if (res.success()) {
-                String msg = CommandLine.Help.Ansi.AUTO.string("@|yellow ⚠ " + res.message() + "|@");
+                String msg = CommandLine.Help.Ansi.AUTO.string("@|yellow " + res.message() + "|@");
                 System.out.println(msg);
             } else {
-                String msg = CommandLine.Help.Ansi.AUTO.string("@|red ✗ " + res.message() + "|@");
+                String msg = CommandLine.Help.Ansi.AUTO.string("@|red " + res.message() + "|@");
                 System.out.println(msg);
             }
             return;
@@ -170,7 +170,7 @@ public class TutorRequestCommand implements Runnable {
             ));
 
         } catch (Exception e) {
-            String msg = CommandLine.Help.Ansi.AUTO.string("@|red ✗ ERROR: " + e.getMessage() + "|@");
+            String msg = CommandLine.Help.Ansi.AUTO.string("@|red ERROR: " + e.getMessage() + "|@");
             System.out.println(msg);
         }
     }
