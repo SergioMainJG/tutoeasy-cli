@@ -8,13 +8,14 @@ import java.time.LocalDateTime;
 
 /**
  * Represents a report entity in the database.
- * This class is mapped to the "Reports" table and contains information about a report.
+ * This class is mapped to the "Reports" table and contains information about a
+ * report.
  */
 @Entity
 @Table(name = "Reports", indexes = {
-    @Index(name = "idx_report_admin", columnList = "createdByAdmin"),
-    @Index(name = "idx_report_type", columnList = "reportType"),
-    @Index(name = "idx_report_created", columnList = "createdAt")
+        @Index(name = "idx_report_admin", columnList = "createdByAdmin"),
+        @Index(name = "idx_report_type", columnList = "reportType"),
+        @Index(name = "idx_report_created", columnList = "createdAt")
 })
 @Getter
 @Setter
