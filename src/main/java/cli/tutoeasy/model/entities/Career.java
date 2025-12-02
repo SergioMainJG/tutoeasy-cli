@@ -2,12 +2,11 @@ package cli.tutoeasy.model.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Represents a career entity in the database.
- * This class is mapped to the "Careers" table and contains information about a career.
+ * This class is mapped to the "Careers" table and contains information about a
+ * career.
  */
 @Entity
 @Table(name = "Careers")

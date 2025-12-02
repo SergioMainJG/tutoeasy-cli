@@ -6,6 +6,7 @@ import cli.tutoeasy.model.entities.Tutoring;
 import cli.tutoeasy.model.entities.TutoringStatus;
 import cli.tutoeasy.model.entities.User;
 import cli.tutoeasy.model.entities.UserRole;
+import cli.tutoeasy.repository.NotificationRepository;
 import cli.tutoeasy.repository.TutorRepository;
 import cli.tutoeasy.repository.TutoringRepository;
 import cli.tutoeasy.repository.UserRepository;
@@ -14,8 +15,10 @@ import java.util.List;
 
 /**
  * Service class for handling tutor-related operations.
- * This class provides methods for creating tutors, managing tutoring requests, and other tutor-specific functionalities.
- * It uses {@link UserRepository}, {@link TutorRepository}, and {@link TutoringRepository} to interact with the database.
+ * This class provides methods for creating tutors, managing tutoring requests,
+ * and other tutor-specific functionalities.
+ * It uses {@link UserRepository}, {@link TutorRepository}, and
+ * {@link TutoringRepository} to interact with the database.
  *
  * @see UserRepository
  * @see TutorRepository
@@ -35,6 +38,10 @@ public class TutorService {
      * The repository for managing tutoring data.
      */
     private final TutoringRepository tutoringRepository;
+    /**
+     * The repository for managing notifications
+     */
+    private final NotificationRepository notificationRepository;
 
     /**
      * Constructs a new instance of the {@code TutorService}.
@@ -46,11 +53,12 @@ public class TutorService {
     public TutorService(
             UserRepository userRepository,
             TutorRepository tutorRepository,
-            TutoringRepository tutoringRepository
-    ) {
+            TutoringRepository tutoringRepository,
+            NotificationRepository notificationRepository) {
         this.userRepository = userRepository;
         this.tutorRepository = tutorRepository;
         this.tutoringRepository = tutoringRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     /**
@@ -81,7 +89,8 @@ public class TutorService {
      * Retrieves a list of pending tutoring requests for a given tutor.
      *
      * @param tutorId The ID of the tutor.
-     * @return A list of {@link TutorTutoringRequestDto} objects representing the pending requests.
+     * @return A list of {@link TutorTutoringRequestDto} objects representing the
+     * pending requests.
      * @throws IllegalArgumentException if the user is not a tutor.
      */
     public List<TutorTutoringRequestDto> getPending(int tutorId) {
@@ -102,8 +111,7 @@ public class TutorService {
                                 ? t.getTopic().getName()
                                 : "No topic",
                         t.getMeetingDate(),
-                        t.getMeetingTime()
-                ))
+                        t.getMeetingTime()))
                 .toList();
     }
 
@@ -115,7 +123,6 @@ public class TutorService {
      * @return An {@link ActionResponseDto} indicating the result of the operation.
      */
     public ActionResponseDto accept(int tutorId, int tutoringId) {
-
         var tutor = tutorRepository.findById(tutorId);
         if (tutor == null)
             return new ActionResponseDto(false, "You are not a tutor.");
@@ -130,25 +137,28 @@ public class TutorService {
         if (tutoringRepository.hasScheduleConflict(
                 tutorId,
                 tutoring.getMeetingDate(),
-                tutoring.getMeetingTime()
-        )) {
+                tutoring.getMeetingTime())) {
             return new ActionResponseDto(false, "Schedule conflict detected.");
         }
 
         tutoringRepository.updateStatus(tutoringId, TutoringStatus.confirmed);
 
+        String message = String.format(
+                "Your tutoring request for %s on %s at %s has been confirmed by %s",
+                tutoring.getSubject().getName(),
+                tutoring.getMeetingDate(),
+                tutoring.getMeetingTime(),
+                tutor.getUsername());
+        notificationRepository.createNotification(tutoring.getStudent(), message,
+                "TUTORING_CONFIRMED");
+
         return new ActionResponseDto(true, "Tutoring confirmed.");
     }
 
     /**
-     * Rejects a tutoring request.
-     *
-     * @param tutorId    The ID of the tutor.
-     * @param tutoringId The ID of the tutoring request to reject.
-     * @return An {@link ActionResponseDto} indicating the result of the operation.
+     * Rejects a tutoring request and notifies the student
      */
     public ActionResponseDto reject(int tutorId, int tutoringId) {
-
         var tutor = tutorRepository.findById(tutorId);
         if (tutor == null)
             return new ActionResponseDto(false, "You are not a tutor.");
@@ -162,6 +172,43 @@ public class TutorService {
 
         tutoringRepository.updateStatus(tutoringId, TutoringStatus.canceled);
 
-        return new ActionResponseDto(true, "Tutoring canceled.");
+        String message = String.format(
+                "Your tutoring request for %s on %s at %s has been rejected by %s",
+                tutoring.getSubject().getName(),
+                tutoring.getMeetingDate(),
+                tutoring.getMeetingTime(),
+                tutor.getUsername());
+        notificationRepository.createNotification(tutoring.getStudent(), message,
+                "TUTORING_REJECTED");
+
+        return new ActionResponseDto(true, "Tutoring rejected.");
     }
+
+    /**
+     * Marks tutoring as completed and notifies student
+     */
+    public ActionResponseDto completeTutoring(int tutorId, int tutoringId) {
+        var tutor = tutorRepository.findById(tutorId);
+        if (tutor == null)
+            return new ActionResponseDto(false, "You are not a tutor.");
+
+        var tutoring = tutoringRepository.findById(tutoringId);
+        if (tutoring == null || tutoring.getTutor().getId() != tutorId)
+            return new ActionResponseDto(false, "Tutoring not found or not yours.");
+
+        if (tutoring.getStatus() != TutoringStatus.confirmed)
+            return new ActionResponseDto(false, "Can only complete confirmed tutorings.");
+
+        tutoringRepository.updateStatus(tutoringId, TutoringStatus.completed);
+
+        String message = String.format(
+                "Your tutoring session for %s on %s has been marked as completed by the tutor",
+                tutoring.getSubject().getName(),
+                tutoring.getMeetingDate());
+        notificationRepository.createNotification(tutoring.getStudent(), message,
+                "TUTORING_COMPLETED");
+
+        return new ActionResponseDto(true, "Tutoring marked as completed.");
+    }
+
 }

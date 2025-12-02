@@ -9,13 +9,16 @@ import java.util.List;
 
 /**
  * <p>
- * This class is responsible for managing {@link Tutoring} entities in the database.
- * It extends {@link BaseRepository} to inherit common CRUD operations and provides
+ * This class is responsible for managing {@link Tutoring} entities in the
+ * database.
+ * It extends {@link BaseRepository} to inherit common CRUD operations and
+ * provides
  * specialized queries for tutoring-related data.
  * </p>
  *
  * <p>
- * The repository handles operations such as finding pending tutoring sessions for a
+ * The repository handles operations such as finding pending tutoring sessions
+ * for a
  * specific tutor, checking for schedule conflicts, and updating the status of a
  * tutoring session.
  * </p>
@@ -40,12 +43,12 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
      * Retrieves a list of pending tutoring sessions for a specific tutor. The list
      * is ordered by meeting date and time.
      *
-     * @param tutorId The ID of the tutor whose pending sessions are to be retrieved.
+     * @param tutorId The ID of the tutor whose pending sessions are to be
+     *                retrieved.
      * @return A list of {@link Tutoring} objects representing pending sessions.
      */
     public List<Tutoring> findPendingByTutor(int tutorId) {
-        return executeQuery(em ->
-                em.createQuery("""
+        return executeQuery(em -> em.createQuery("""
                 SELECT t FROM Tutoring t
                 LEFT JOIN FETCH t.student
                 LEFT JOIN FETCH t.tutor
@@ -55,31 +58,31 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
                 AND t.status = :status
                 ORDER BY t.meetingDate ASC, t.meetingTime ASC
                 """, Tutoring.class)
-                        .setParameter("tutorId", tutorId)
-                        .setParameter("status", TutoringStatus.unconfirmed)
-                        .getResultList()
-        );
+                .setParameter("tutorId", tutorId)
+                .setParameter("status", TutoringStatus.unconfirmed)
+                .getResultList());
     }
 
     /**
-     * Checks if a tutor has a confirmed tutoring session at a specific date and time.
+     * Checks if a tutor has a confirmed tutoring session at a specific date and
+     * time.
      * This is used to prevent schedule conflicts when accepting new requests.
      *
      * @param tutorId The ID of the tutor to check for conflicts.
-     * @param date The date of the potential tutoring session.
-     * @param time The time of the potential tutoring session.
+     * @param date    The date of the potential tutoring session.
+     * @param time    The time of the potential tutoring session.
      * @return {@code true} if a schedule conflict exists, {@code false} otherwise.
      */
     public boolean hasScheduleConflict(int tutorId, LocalDate date, LocalTime time) {
         return executeQuery(em -> {
             Long count = em.createQuery("""
-                SELECT COUNT(t)
-                FROM Tutoring t
-                WHERE t.tutor.id = :tutorId
-                AND t.meetingDate = :date
-                AND t.meetingTime = :time
-                AND t.status = :status
-                """, Long.class)
+                    SELECT COUNT(t)
+                    FROM Tutoring t
+                    WHERE t.tutor.id = :tutorId
+                    AND t.meetingDate = :date
+                    AND t.meetingTime = :time
+                    AND t.status = :status
+                    """, Long.class)
                     .setParameter("tutorId", tutorId)
                     .setParameter("date", date)
                     .setParameter("time", time)
@@ -91,17 +94,97 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
     }
 
     /**
-     * Updates the status of a tutoring session. This is typically used to change the
+     * Updates the status of a tutoring session. This is typically used to change
+     * the
      * status from "unconfirmed" to "confirmed" or "rejected".
      *
      * @param tutoringId The ID of the tutoring session to update.
-     * @param status The new status to be set for the tutoring session.
+     * @param status     The new status to be set for the tutoring session.
      */
     public void updateStatus(int tutoringId, TutoringStatus status) {
         executeInTransaction(em -> {
             Tutoring t = em.find(Tutoring.class, tutoringId);
             if (t != null) {
                 t.setStatus(status);
+            }
+        });
+    }
+
+    /**
+     * Finds upcoming tutoring sessions for a student (after current date)
+     */
+    public List<Tutoring> findUpcomingByStudent(int studentId) {
+        LocalDate today = LocalDate.now();
+        return executeQuery(em -> em.createQuery("""
+                SELECT t FROM Tutoring t
+                LEFT JOIN FETCH t.student
+                LEFT JOIN FETCH t.tutor
+                LEFT JOIN FETCH t.subject
+                LEFT JOIN FETCH t.topic
+                WHERE t.student.id = :studentId
+                AND t.meetingDate >= :today
+                AND t.status != :canceledStatus
+                ORDER BY t.meetingDate ASC, t.meetingTime ASC
+                """, Tutoring.class)
+                .setParameter("studentId", studentId)
+                .setParameter("today", today)
+                .setParameter("canceledStatus", TutoringStatus.canceled)
+                .getResultList());
+    }
+
+    /**
+     * Finds a tutoring by ID with all relationships loaded
+     */
+    public Tutoring findByIdWithDetails(int tutoringId) {
+        return executeQuery(em -> em.createQuery("""
+                SELECT t FROM Tutoring t
+                LEFT JOIN FETCH t.student
+                LEFT JOIN FETCH t.tutor
+                LEFT JOIN FETCH t.subject
+                LEFT JOIN FETCH t.topic
+                WHERE t.id = :tutoringId
+                """, Tutoring.class)
+                .setParameter("tutoringId", tutoringId)
+                .getSingleResult());
+    }
+
+    /**
+     * Checks if a tutor has a schedule conflict excluding a specific tutoring
+     */
+    public boolean hasScheduleConflictExcluding(int tutorId, LocalDate date, LocalTime time, int excludeTutoringId) {
+        return executeQuery(em -> {
+            Long count = em.createQuery("""
+                    SELECT COUNT(t)
+                    FROM Tutoring t
+                    WHERE t.tutor.id = :tutorId
+                    AND t.meetingDate = :date
+                    AND t.meetingTime = :time
+                    AND t.status = :status
+                    AND t.id != :excludeId
+                    """, Long.class)
+                    .setParameter("tutorId", tutorId)
+                    .setParameter("date", date)
+                    .setParameter("time", time)
+                    .setParameter("status", TutoringStatus.confirmed)
+                    .setParameter("excludeId", excludeTutoringId)
+                    .getSingleResult();
+            return count > 0;
+        });
+    }
+
+    /**
+     * Updates tutoring details (for student modifications)
+     */
+    public void updateTutoringDetails(int tutoringId, LocalDate newDate, LocalTime newTime, String topicName) {
+        executeInTransaction(em -> {
+            Tutoring t = em.find(Tutoring.class, tutoringId);
+            if (t != null) {
+                if (newDate != null) {
+                    t.setMeetingDate(newDate);
+                }
+                if (newTime != null) {
+                    t.setMeetingTime(newTime);
+                }
             }
         });
     }
