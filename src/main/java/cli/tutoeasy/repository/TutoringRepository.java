@@ -112,7 +112,10 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
     }
 
     /**
-     * Finds upcoming tutoring sessions for a student (after current date)
+     * Finds upcoming tutoring sessions for a student (after current date).
+     *
+     * @param studentId The ID of the student.
+     * @return A list of upcoming tutoring sessions.
      */
     public List<Tutoring> findUpcomingByStudent(int studentId) {
         LocalDate today = LocalDate.now();
@@ -134,7 +137,10 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
     }
 
     /**
-     * Finds a tutoring by ID with all relationships loaded
+     * Finds a tutoring by ID with all relationships loaded.
+     *
+     * @param tutoringId The ID of the tutoring session.
+     * @return The tutoring session with all details loaded.
      */
     public Tutoring findByIdWithDetails(int tutoringId) {
         return executeQuery(em -> em.createQuery("""
@@ -150,7 +156,13 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
     }
 
     /**
-     * Checks if a tutor has a schedule conflict excluding a specific tutoring
+     * Checks if a tutor has a schedule conflict excluding a specific tutoring.
+     *
+     * @param tutorId           The ID of the tutor.
+     * @param date              The date of the session.
+     * @param time              The time of the session.
+     * @param excludeTutoringId The ID of the tutoring to exclude from the check.
+     * @return {@code true} if a conflict exists, {@code false} otherwise.
      */
     public boolean hasScheduleConflictExcluding(int tutorId, LocalDate date, LocalTime time, int excludeTutoringId) {
         return executeQuery(em -> {
@@ -174,7 +186,12 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
     }
 
     /**
-     * Updates tutoring details (for student modifications)
+     * Updates tutoring details (for student modifications).
+     *
+     * @param tutoringId The ID of the tutoring session to update.
+     * @param newDate    The new date for the session (can be null).
+     * @param newTime    The new time for the session (can be null).
+     * @param topic      The new topic for the session (can be null).
      */
     public void updateTutoringDetails(int tutoringId, LocalDate newDate, LocalTime newTime, Topic topic) {
         executeInTransaction(em -> {
@@ -190,6 +207,63 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
                     t.setTopic(topic);
                 }
             }
+        });
+    }
+
+    /**
+     * Finds tutoring history for a student (past sessions that are completed or canceled).
+     * Results are ordered by meeting date descending (most recent first).
+     *
+     * @param studentId ID of the student
+     * @param limit Optional limit on number of results (null = no limit)
+     * @param statusFilter Optional status filter ("completed" or "canceled", null = both)
+     * @param subjectFilter Optional subject name filter (null = all subjects)
+     * @return List of past tutoring sessions
+     */
+    public List<Tutoring> findHistoryByStudent(int studentId, Integer limit, String statusFilter, String subjectFilter) {
+        LocalDate today = LocalDate.now();
+
+        return executeQuery(em -> {
+            StringBuilder jpql = new StringBuilder("""
+                SELECT t FROM Tutoring t
+                LEFT JOIN FETCH t.student
+                LEFT JOIN FETCH t.tutor
+                LEFT JOIN FETCH t.subject
+                LEFT JOIN FETCH t.topic
+                WHERE t.student.id = :studentId
+                AND t.meetingDate < :today
+                AND (t.status = :completedStatus OR t.status = :canceledStatus)
+                """);
+
+            if (statusFilter != null) {
+                if (statusFilter.equalsIgnoreCase("completed")) {
+                    jpql.append("AND t.status = :completedStatus ");
+                } else if (statusFilter.equalsIgnoreCase("canceled")) {
+                    jpql.append("AND t.status = :canceledStatus ");
+                }
+            }
+
+            if (subjectFilter != null && !subjectFilter.trim().isEmpty()) {
+                jpql.append("AND LOWER(t.subject.name) = LOWER(:subjectName) ");
+            }
+
+            jpql.append("ORDER BY t.meetingDate DESC, t.meetingTime DESC");
+
+            var query = em.createQuery(jpql.toString(), Tutoring.class)
+                    .setParameter("studentId", studentId)
+                    .setParameter("today", today)
+                    .setParameter("completedStatus", TutoringStatus.completed)
+                    .setParameter("canceledStatus", TutoringStatus.canceled);
+
+            if (subjectFilter != null && !subjectFilter.trim().isEmpty()) {
+                query.setParameter("subjectName", subjectFilter.trim());
+            }
+
+            if (limit != null && limit > 0) {
+                query.setMaxResults(limit);
+            }
+
+            return query.getResultList();
         });
     }
 }

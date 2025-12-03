@@ -315,4 +315,39 @@ public class StudentTutoringService {
 
         return new ActionResponseDto(true, "Tutoring updated successfully. Waiting for tutor confirmation.");
     }
+
+    /**
+     * Gets tutoring history for a student.
+     * Returns past tutoring sessions that are either completed or canceled.
+     * Results are ordered by date descending (most recent first).
+     *
+     * @param studentId ID of the student
+     * @param limit Optional limit on number of results (null = no limit)
+     * @param statusFilter Optional status filter ("completed" or "canceled", null = both)
+     * @param subjectFilter Optional subject name filter (null = all subjects)
+     * @return List of StudentTutoringHistoryDto with tutoring history
+     */
+    public List<StudentTutoringHistoryDto> getTutoringHistory(
+            int studentId,
+            Integer limit,
+            String statusFilter,
+            String subjectFilter) {
+
+        List<Tutoring> history = tutoringRepository.findHistoryByStudent(
+                studentId,
+                limit,
+                statusFilter,
+                subjectFilter);
+
+        return history.stream()
+                .map(t -> new StudentTutoringHistoryDto(
+                        t.getId(),
+                        t.getTutor().getUsername(),
+                        t.getSubject().getName(),
+                        t.getTopic() != null ? t.getTopic().getName() : null,
+                        t.getMeetingDate(),
+                        t.getMeetingTime(),
+                        t.getStatus().name()))
+                .collect(Collectors.toList());
+    }
 }

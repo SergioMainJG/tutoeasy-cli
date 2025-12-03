@@ -6,6 +6,7 @@ import cli.tutoeasy.command.global.MessageCommand;
 import cli.tutoeasy.command.global.NotificationCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.student.StudentCommand;
+import cli.tutoeasy.command.student.StudentHistoryCommand;
 import cli.tutoeasy.command.student.StudentRequestCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
@@ -161,6 +162,10 @@ public class AppFactory implements CommandLine.IFactory {
 
         if (cls == StudentRequestCommand.class ){
             return (K) new StudentRequestCommand(studentTutoringService);
+        }
+
+        if (cls == StudentHistoryCommand.class) {
+            return (K) new StudentHistoryCommand(studentTutoringService);
         }
 
         return cls.getDeclaredConstructor().newInstance();
