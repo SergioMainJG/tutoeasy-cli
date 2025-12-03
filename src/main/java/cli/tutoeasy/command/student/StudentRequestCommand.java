@@ -17,42 +17,81 @@ import java.util.List;
 @Command(name = "request", description = "Manage tutoring requests (Student)", mixinStandardHelpOptions = true)
 public class StudentRequestCommand implements Runnable {
 
+  /**
+   * Subject ID or name for new request.
+   */
   @Option(names = { "--subject", "-s" }, description = "Subject ID or name for new request")
   private String subject;
 
+  /**
+   * Tutor username for new request.
+   */
   @Option(names = { "--tutor", "-t" }, description = "Tutor username for new request")
   private String tutorUsername;
 
+  /**
+   * Meeting date (YYYY-MM-DD).
+   */
   @Option(names = { "--date", "-d" }, description = "Meeting date (YYYY-MM-DD)")
   private String dateStr;
 
+  /**
+   * Meeting time (HH:MM in 24-hour format).
+   */
   @Option(names = { "--time" }, description = "Meeting time (HH:MM in 24-hour format)")
   private String timeStr;
 
+  /**
+   * Topic name (optional).
+   */
   @Option(names = { "--topic" }, description = "Topic name (optional)")
   private String topic;
 
+  /**
+   * Show all upcoming tutorings.
+   */
   @Option(names = { "--show", "-l" }, description = "Show all upcoming tutorings")
   private boolean showRequests;
 
+  /**
+   * Cancel a tutoring by ID.
+   */
   @Option(names = { "--cancel", "-c" }, description = "Cancel a tutoring by ID")
   private Integer cancelId;
 
+  /**
+   * Mark tutoring as completed by ID.
+   */
   @Option(names = { "--complete" }, description = "Mark tutoring as completed by ID")
   private Integer completeId;
 
+  /**
+   * Update tutoring by ID.
+   */
   @Option(names = { "--update", "-u" }, description = "Update tutoring by ID")
   private Integer updateId;
 
+  /**
+   * New date for update (YYYY-MM-DD).
+   */
   @Option(names = { "--new-date" }, description = "New date for update (YYYY-MM-DD)")
   private String newDateStr;
 
+  /**
+   * New time for update (HH:MM).
+   */
   @Option(names = { "--new-time" }, description = "New time for update (HH:MM)")
   private String newTimeStr;
 
+  /**
+   * New topic for update.
+   */
   @Option(names = { "--new-topic" }, description = "New topic for update")
   private String newTopic;
 
+  /**
+   * The service responsible for handling student tutoring operations.
+   */
   private final StudentTutoringService studentTutoringService;
 
   public StudentRequestCommand(StudentTutoringService studentTutoringService) {

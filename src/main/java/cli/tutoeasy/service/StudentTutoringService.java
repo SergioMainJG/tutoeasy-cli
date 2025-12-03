@@ -22,6 +22,7 @@ public class StudentTutoringService {
     private final SubjectRepository subjectRepository;
     private final ContactRepository contactRepository;
     private final NotificationService notificationService;
+    private final TopicRepository topicRepository;
 
     /**
      * Constructor with dependency injection
@@ -31,18 +32,21 @@ public class StudentTutoringService {
      * @param subjectRepository Repository for subject operations
      * @param contactRepository Repository for contact operations
      * @param notificationService Service for notification operations
+     * @param topicRepository Repository for topic operations
      */
     public StudentTutoringService(
             TutoringRepository tutoringRepository,
             UserRepository userRepository,
             SubjectRepository subjectRepository,
             ContactRepository contactRepository,
-            NotificationService notificationService) {
+            NotificationService notificationService,
+            TopicRepository topicRepository) {
         this.tutoringRepository = tutoringRepository;
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
         this.contactRepository = contactRepository;
         this.notificationService = notificationService;
+        this.topicRepository = topicRepository;
     }
 
     /**
@@ -54,48 +58,45 @@ public class StudentTutoringService {
      * @return ActionResponseDto indicating success or failure
      */
     public ActionResponseDto createTutoringRequest(int studentId, CreateTutoringRequestDto dto) {
-        // Validate date is not in the past
         LocalDate today = LocalDate.now();
         if (dto.meetingDate().isBefore(today)) {
             return new ActionResponseDto(false, "Cannot create tutoring for past dates.");
         }
 
-        // Validate student exists
         User student = userRepository.findById(studentId);
         if (student == null) {
             return new ActionResponseDto(false, "Student not found.");
         }
 
-        // Validate tutor exists
         User tutor = contactRepository.findByUsername(dto.tutorUsername());
         if (tutor == null) {
             return new ActionResponseDto(false, "Tutor not found: " + dto.tutorUsername());
         }
 
-        // Validate tutor role
         if (tutor.getRol() != UserRole.tutor) {
             return new ActionResponseDto(false, dto.tutorUsername() + " is not a tutor.");
         }
 
-        // Find subject by ID or name
         Subject subject;
         try {
             int subjectId = Integer.parseInt(dto.subjectNameOrId());
             subject = subjectRepository.findById(subjectId);
+            if (subject == null) {
+                return new ActionResponseDto(false, "Subject not found with ID: " + dto.subjectNameOrId());
+            }
         } catch (NumberFormatException e) {
             subject = subjectRepository.findByName(dto.subjectNameOrId());
+            if (subject == null) {
+                subject = new Subject();
+                subject.setName(dto.subjectNameOrId());
+                subjectRepository.save(subject);
+            }
         }
 
-        if (subject == null) {
-            return new ActionResponseDto(false, "Subject not found: " + dto.subjectNameOrId());
-        }
-
-        // Check for schedule conflicts
         if (tutoringRepository.hasScheduleConflict(tutor.getId(), dto.meetingDate(), dto.meetingTime())) {
             return new ActionResponseDto(false, "Tutor already has a confirmed session at that time.");
         }
 
-        // Create tutoring entity
         Tutoring tutoring = new Tutoring();
         tutoring.setStudent(student);
         tutoring.setTutor(tutor);
@@ -104,24 +105,28 @@ public class StudentTutoringService {
         tutoring.setMeetingTime(dto.meetingTime());
         tutoring.setStatus(TutoringStatus.unconfirmed);
 
-        // Handle topic (if provided)
         if (dto.topicName() != null && !dto.topicName().trim().isEmpty()) {
-            // Topic handling logic here if needed
+            Topic topic = topicRepository.findByNameAndSubject(dto.topicName().trim(), subject.getId());
+            if (topic != null) {
+                tutoring.setTopic(topic);
+            }
         }
 
-        // Save tutoring request
         tutoringRepository.save(tutoring);
 
-        // Send notification to tutor
         String notificationMessage = String.format(
                 "New tutoring request from %s for %s on %s at %s",
                 student.getUsername(),
                 subject.getName(),
                 dto.meetingDate(),
                 dto.meetingTime());
-        notificationService.addNotification(tutor.getId(), notificationMessage, "TUTORING_REQUEST");
+        boolean notified = notificationService.addNotification(tutor.getId(), notificationMessage, "TUTORING_REQUEST");
 
-        return new ActionResponseDto(true, "Tutoring request created successfully. Waiting for tutor confirmation.");
+        String responseMsg = "Tutoring request created successfully. Waiting for tutor confirmation.";
+        if (!notified) {
+            responseMsg += " (Warning: Failed to send notification to tutor)";
+        }
+        return new ActionResponseDto(true, responseMsg);
     }
 
     /**
@@ -156,14 +161,8 @@ public class StudentTutoringService {
      * @return ActionResponseDto indicating success or failure
      */
     public ActionResponseDto cancelTutoring(int studentId, int tutoringId) {
-        // Load tutoring with all relationships
-        Tutoring tutoring;
-        try {
-            tutoring = tutoringRepository.findByIdWithDetails(tutoringId);
-        } catch (Exception e) {
-            return new ActionResponseDto(false, "Tutoring not found.");
-        }
-
+        Tutoring tutoring = tutoringRepository.findByIdWithDetails(tutoringId);
+        
         if (tutoring == null) {
             return new ActionResponseDto(false, "Tutoring not found.");
         }
@@ -180,16 +179,13 @@ public class StudentTutoringService {
             return new ActionResponseDto(false, "Cannot cancel a completed tutoring.");
         }
 
-        // Extract needed info before closing session
         int tutorId = tutoring.getTutor().getId();
         String subjectName = tutoring.getSubject().getName();
         LocalDate meetingDate = tutoring.getMeetingDate();
         LocalTime meetingTime = tutoring.getMeetingTime();
 
-        // Update status to canceled
         tutoringRepository.updateStatus(tutoringId, TutoringStatus.canceled);
 
-        // Notify tutor (using extracted data)
         String notificationMessage = String.format(
                 "Tutoring session for %s on %s at %s has been canceled by the student",
                 subjectName,
@@ -210,13 +206,7 @@ public class StudentTutoringService {
      * @return ActionResponseDto indicating success or failure
      */
     public ActionResponseDto completeTutoring(int studentId, int tutoringId) {
-        // Load tutoring with all relationships
-        Tutoring tutoring;
-        try {
-            tutoring = tutoringRepository.findByIdWithDetails(tutoringId);
-        } catch (Exception e) {
-            return new ActionResponseDto(false, "Tutoring not found.");
-        }
+        Tutoring tutoring = tutoringRepository.findByIdWithDetails(tutoringId);
 
         if (tutoring == null) {
             return new ActionResponseDto(false, "Tutoring not found.");
@@ -230,21 +220,17 @@ public class StudentTutoringService {
             return new ActionResponseDto(false, "Can only complete confirmed tutorings.");
         }
 
-        // Check if session time has passed
         LocalDateTime sessionDateTime = LocalDateTime.of(tutoring.getMeetingDate(), tutoring.getMeetingTime());
         if (LocalDateTime.now().isBefore(sessionDateTime)) {
             return new ActionResponseDto(false, "Cannot mark as completed before the session time.");
         }
 
-        // Extract needed info before closing session
         int tutorId = tutoring.getTutor().getId();
         String subjectName = tutoring.getSubject().getName();
         LocalDate meetingDate = tutoring.getMeetingDate();
 
-        // Update status to completed
         tutoringRepository.updateStatus(tutoringId, TutoringStatus.completed);
 
-        // Notify tutor (using extracted data)
         String notificationMessage = String.format(
                 "Tutoring session for %s on %s has been marked as completed",
                 subjectName,
@@ -266,13 +252,7 @@ public class StudentTutoringService {
      * @return ActionResponseDto indicating success or failure
      */
     public ActionResponseDto updateTutoring(int studentId, UpdateTutoringRequestDto dto) {
-        // Load tutoring with all relationships
-        Tutoring tutoring;
-        try {
-            tutoring = tutoringRepository.findByIdWithDetails(dto.tutoringId());
-        } catch (Exception e) {
-            return new ActionResponseDto(false, "Tutoring not found.");
-        }
+        Tutoring tutoring = tutoringRepository.findByIdWithDetails(dto.tutoringId());
 
         if (tutoring == null) {
             return new ActionResponseDto(false, "Tutoring not found.");
@@ -290,28 +270,23 @@ public class StudentTutoringService {
             return new ActionResponseDto(false, "Cannot update a canceled tutoring.");
         }
 
-        // Check if session has already passed
         LocalDateTime sessionDateTime = LocalDateTime.of(tutoring.getMeetingDate(), tutoring.getMeetingTime());
         if (LocalDateTime.now().isAfter(sessionDateTime)) {
             return new ActionResponseDto(false, "Cannot update a tutoring that has already passed.");
         }
 
-        // Extract current values
         LocalDate currentDate = tutoring.getMeetingDate();
         LocalTime currentTime = tutoring.getMeetingTime();
         int tutorId = tutoring.getTutor().getId();
         String subjectName = tutoring.getSubject().getName();
 
-        // Determine new date and time
         LocalDate newDate = dto.meetingDate() != null ? dto.meetingDate() : currentDate;
         LocalTime newTime = dto.meetingTime() != null ? dto.meetingTime() : currentTime;
 
-        // Validate new date is not in the past
         if (newDate.isBefore(LocalDate.now())) {
             return new ActionResponseDto(false, "Cannot schedule tutoring for past dates.");
         }
 
-        // Check for schedule conflicts (excluding current tutoring)
         if (tutoringRepository.hasScheduleConflictExcluding(
                 tutorId,
                 newDate,
@@ -320,15 +295,17 @@ public class StudentTutoringService {
             return new ActionResponseDto(false, "Tutor already has a session at the new time.");
         }
 
-        // Update tutoring details
-        tutoringRepository.updateTutoringDetails(dto.tutoringId(), newDate, newTime, dto.topicName());
+        Topic newTopic = null;
+        if (dto.topicName() != null && !dto.topicName().trim().isEmpty()) {
+             newTopic = topicRepository.findByNameAndSubject(dto.topicName().trim(), tutoring.getSubject().getId());
+        }
 
-        // If date or time changed, reset status to unconfirmed
+        tutoringRepository.updateTutoringDetails(dto.tutoringId(), newDate, newTime, newTopic);
+
         if (!newDate.equals(currentDate) || !newTime.equals(currentTime)) {
             tutoringRepository.updateStatus(dto.tutoringId(), TutoringStatus.unconfirmed);
         }
 
-        // Notify tutor (using extracted data)
         String notificationMessage = String.format(
                 "Tutoring session for %s has been updated. New schedule: %s at %s",
                 subjectName,

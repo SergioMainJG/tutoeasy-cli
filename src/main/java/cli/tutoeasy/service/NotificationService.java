@@ -64,22 +64,19 @@ public class NotificationService {
         List<Notification> notifications;
 
         if (limit == null) {
-            // Get last 10 unread notifications
             notifications = notificationRepository.findUnreadByUser(userId);
             if (notifications.size() > 10) {
                 notifications = notifications.subList(0, 10);
             }
         } else {
-            // Get specified number of notifications (read and unread)
             notifications = notificationRepository.findByUser(userId);
             if (notifications.size() > limit) {
                 notifications = notifications.subList(0, limit);
             }
         }
 
-        // Mark retrieved notifications as read
         for (Notification notification : notifications) {
-            if (!notification.isWasReaded()) {
+            if (!notification.isWasRead()) {
                 notificationRepository.markAsRead(notification.getId());
             }
         }

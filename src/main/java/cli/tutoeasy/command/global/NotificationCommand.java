@@ -15,15 +15,27 @@ import java.util.List;
 @Command(name = "notifications", description = "View and manage your notifications", mixinStandardHelpOptions = true)
 public class NotificationCommand implements Runnable {
 
+    /**
+     * Number of notifications to retrieve (default: 10 unread).
+     */
     @Option(names = { "--limit", "-l" }, description = "Number of notifications to retrieve (default: 10 unread)")
     private Integer limit;
 
+    /**
+     * Mark all notifications as read.
+     */
     @Option(names = { "--mark-all-read", "-m" }, description = "Mark all notifications as read")
     private boolean markAllRead;
 
+    /**
+     * Show only the count of unread notifications.
+     */
     @Option(names = { "--count", "-c" }, description = "Show only the count of unread notifications")
     private boolean showCount;
 
+    /**
+     * The service responsible for handling notification-related operations.
+     */
     private final NotificationService notificationService;
 
     /**
@@ -79,7 +91,7 @@ public class NotificationCommand implements Runnable {
             Notification notif = notifications.get(i);
 
             String typeColor = getTypeColor(notif.getType());
-            String readStatus = notif.isWasReaded() ? "@|dim (read)|@" : "@|bold,yellow (new)|@";
+            String readStatus = notif.isWasRead() ? "@|faint (read)|@" : "@|bold,yellow (new)|@";
 
             System.out.println(Help.Ansi.AUTO.string(String.format(
                     "@|bold %d.|@ %s",
@@ -98,7 +110,7 @@ public class NotificationCommand implements Runnable {
                     notif.getMessage())));
 
             System.out.println(Help.Ansi.AUTO.string(String.format(
-                    "    Date: @|dim %s|@",
+                    "    Date: @|faint %s|@",
                     notif.getCreatedAt().format(formatter))));
 
             System.out.println();

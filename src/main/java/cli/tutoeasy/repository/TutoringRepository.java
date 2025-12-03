@@ -1,5 +1,6 @@
 package cli.tutoeasy.repository;
 
+import cli.tutoeasy.model.entities.Topic;
 import cli.tutoeasy.model.entities.Tutoring;
 import cli.tutoeasy.model.entities.TutoringStatus;
 
@@ -175,7 +176,7 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
     /**
      * Updates tutoring details (for student modifications)
      */
-    public void updateTutoringDetails(int tutoringId, LocalDate newDate, LocalTime newTime, String topicName) {
+    public void updateTutoringDetails(int tutoringId, LocalDate newDate, LocalTime newTime, Topic topic) {
         executeInTransaction(em -> {
             Tutoring t = em.find(Tutoring.class, tutoringId);
             if (t != null) {
@@ -184,6 +185,9 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
                 }
                 if (newTime != null) {
                     t.setMeetingTime(newTime);
+                }
+                if (topic != null) {
+                    t.setTopic(topic);
                 }
             }
         });

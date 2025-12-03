@@ -12,13 +12,22 @@ import picocli.CommandLine.*;
 @Command(name = "contact", description = "Get contact information of users", mixinStandardHelpOptions = true)
 public class ContactCommand implements Runnable {
 
+  /**
+   * Get contact info by username.
+   */
   @Option(names = { "--info-of", "-u" }, description = "Get contact info by username", paramLabel = "<username>")
   private String username;
 
+  /**
+   * Get contact info from a tutoring session (returns tutor if you're student, or student if you're tutor).
+   */
   @Option(names = { "--info-from",
       "-t" }, description = "Get contact info from a tutoring session (returns tutor if you're student, or student if you're tutor)", paramLabel = "<tutoring-id>")
   private Integer tutoringId;
 
+  /**
+   * The service responsible for handling contact-related operations.
+   */
   private final ContactService contactService;
 
   public ContactCommand(ContactService contactService) {

@@ -29,7 +29,7 @@ public class NotificationRepository extends BaseRepository<Notification> {
             notification.setMessage(message);
             notification.setType(type);
             notification.setCreatedAt(LocalDateTime.now());
-            notification.setWasReaded(false);
+            notification.setWasRead(false);
             em.persist(notification);
         });
     }
@@ -60,7 +60,7 @@ public class NotificationRepository extends BaseRepository<Notification> {
         return executeQuery(em -> em.createQuery("""
         SELECT n FROM Notification n
         WHERE n.user.id = :userId
-        AND n.wasReaded = false
+        AND n.wasRead = false
         ORDER BY n.createdAt DESC
         """, Notification.class)
                 .setParameter("userId", userId)
@@ -76,7 +76,7 @@ public class NotificationRepository extends BaseRepository<Notification> {
         executeInTransaction(em -> {
             Notification notification = em.find(Notification.class, notificationId);
             if (notification != null) {
-                notification.setWasReaded(true);
+                notification.setWasRead(true);
             }
         });
     }
@@ -90,9 +90,9 @@ public class NotificationRepository extends BaseRepository<Notification> {
         executeInTransaction(em -> {
             em.createQuery("""
           UPDATE Notification n
-          SET n.wasReaded = true
+          SET n.wasRead = true
           WHERE n.user.id = :userId
-          AND n.wasReaded = false
+          AND n.wasRead = false
           """)
                     .setParameter("userId", userId)
                     .executeUpdate();

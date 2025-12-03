@@ -53,6 +53,10 @@ public class AppFactory implements CommandLine.IFactory {
      */
     private final SubjectRepository subjectRepository;
     /**
+     * The repository for managing topic data.
+     */
+    private final TopicRepository topicRepository;
+    /**
      * The service for student-related operations.
      */
     private final StudentService studentService;
@@ -76,7 +80,13 @@ public class AppFactory implements CommandLine.IFactory {
      * The service for message-related operations.
      */
     private final MessageService messageService;
+    /**
+     * The service for notification-related operations.
+     */
     private final NotificationService notificationService;
+    /**
+     * The service for student tutoring-related operations.
+     */
     private final StudentTutoringService studentTutoringService;
 
     /**
@@ -92,6 +102,7 @@ public class AppFactory implements CommandLine.IFactory {
         this.messageRepository = new MessageRepository();
         this.notificationRepository = new NotificationRepository();
         this.subjectRepository = new SubjectRepository();
+        this.topicRepository = new TopicRepository();
         this.authService = new AuthService(userRepository);
         this.studentService = new StudentService(userRepository);
         this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository, notificationRepository);
@@ -99,8 +110,7 @@ public class AppFactory implements CommandLine.IFactory {
         this.contactService = new ContactService(contactRepository, tutoringRepository);
         this.messageService = new MessageService(messageRepository, contactRepository, notificationRepository);
         this.notificationService = new NotificationService(notificationRepository, userRepository);
-        // this.subjectService = new SubjectService(subjectRepository);
-        this.studentTutoringService = new StudentTutoringService(tutoringRepository, userRepository, subjectRepository, contactRepository, notificationService);
+        this.studentTutoringService = new StudentTutoringService(tutoringRepository, userRepository, subjectRepository, contactRepository, notificationService, topicRepository);
     }
 
     /**

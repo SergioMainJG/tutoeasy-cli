@@ -127,7 +127,7 @@ public class TutorService {
         if (tutor == null)
             return new ActionResponseDto(false, "You are not a tutor.");
 
-        var tutoring = tutoringRepository.findById(tutoringId);
+        var tutoring = tutoringRepository.findByIdWithDetails(tutoringId);
         if (tutoring == null || tutoring.getTutor().getId() != tutorId)
             return new ActionResponseDto(false, "Tutoring not found or not yours.");
 
@@ -163,7 +163,7 @@ public class TutorService {
         if (tutor == null)
             return new ActionResponseDto(false, "You are not a tutor.");
 
-        var tutoring = tutoringRepository.findById(tutoringId);
+        var tutoring = tutoringRepository.findByIdWithDetails(tutoringId);
         if (tutoring == null || tutoring.getTutor().getId() != tutorId)
             return new ActionResponseDto(false, "Tutoring not found or not yours.");
 
@@ -192,7 +192,7 @@ public class TutorService {
         if (tutor == null)
             return new ActionResponseDto(false, "You are not a tutor.");
 
-        var tutoring = tutoringRepository.findById(tutoringId);
+        var tutoring = tutoringRepository.findByIdWithDetails(tutoringId);
         if (tutoring == null || tutoring.getTutor().getId() != tutorId)
             return new ActionResponseDto(false, "Tutoring not found or not yours.");
 

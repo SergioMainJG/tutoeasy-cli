@@ -27,7 +27,7 @@ public class Argon2Util {
     /**
      * The memory cost in kilobytes.
      */
-    private static final int MEMORY_KB = 65536; // 64MB
+    private static final int MEMORY_KB = 65536;
     /**
      * The degree of parallelism to use for the Argon2 algorithm.
      */
