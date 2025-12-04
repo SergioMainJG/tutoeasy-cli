@@ -47,6 +47,8 @@ import picocli.CommandLine.Command;
         ReportCommand.class
         StudentHistoryCommand.class,
         ProfileCommand.class,
+        StudentHistoryCommand.class,
+        EditTutorProfileCommand.class
 }, mixinStandardHelpOptions = true)
 public class RootCommand implements Runnable {
     /**

@@ -116,6 +116,15 @@ public class AppFactory implements CommandLine.IFactory {
     private final ReportService reportService;
 
     /**
+     * The repository for managing tutors' subjects (expertise) data.
+     */
+    private final TutorExpertiseRepository expertiseRepository;
+
+    /**
+     * The repository for managing tutors' schedule data.
+     */
+    private final TutorScheduleRepository scheduleRepository;
+    /**
      * <p>
      * Constructs a new instance of the {@code AppFactory}.
      * </p>
@@ -141,7 +150,9 @@ public class AppFactory implements CommandLine.IFactory {
         this.contactService = new ContactService(contactRepository, tutoringRepository);
         this.messageService = new MessageService(messageRepository, contactRepository, notificationRepository);
         this.notificationService = new NotificationService(notificationRepository, userRepository);
-        this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository, notificationService);
+        this.expertiseRepository = new TutorExpertiseRepository();
+        this.scheduleRepository = new TutorScheduleRepository();
+        this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository, notificationService,subjectRepository,expertiseRepository, scheduleRepository);
         this.studentTutoringService = new StudentTutoringService(tutoringRepository, userRepository, subjectRepository, contactRepository, notificationService, topicRepository);
         this.profileService = new ProfileService(userRepository, careerRepository);
         this.reportService = new ReportService(reportRepository, userRepository);
@@ -199,6 +210,9 @@ public class AppFactory implements CommandLine.IFactory {
 
         if (cls == StudentHistoryCommand.class) {
             return (K) new StudentHistoryCommand(studentTutoringService);
+        }
+        if (cls == EditTutorProfileCommand.class){
+            return (K) new EditTutorProfileCommand(tutorService);
         }
 
         return cls.getDeclaredConstructor().newInstance();
