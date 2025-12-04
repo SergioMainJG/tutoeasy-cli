@@ -6,20 +6,34 @@ import cli.tutoeasy.service.ContactService;
 import picocli.CommandLine.*;
 
 /**
+ * <p>
  * Command for retrieving contact information.
  * Allows users to get contact details by username or from a tutoring session.
+ * </p>
+ *
+ * <p>
+ * This command is useful for students and tutors to find contact details of each other
+ * to facilitate communication outside the platform if necessary.
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ * @see ContactService
+ * @see ContactInfoDto
  */
 @Command(name = "contact", description = "Get contact information of users", mixinStandardHelpOptions = true)
 public class ContactCommand implements Runnable {
 
   /**
-   * Get contact info by username.
+   * Option to get contact info by providing a specific username.
    */
   @Option(names = { "--info-of", "-u" }, description = "Get contact info by username", paramLabel = "<username>")
   private String username;
 
   /**
-   * Get contact info from a tutoring session (returns tutor if you're student, or student if you're tutor).
+   * Option to get contact info related to a specific tutoring session.
+   * If the user is a student, it returns the tutor's contact info.
+   * If the user is a tutor, it returns the student's contact info.
    */
   @Option(names = { "--info-from",
       "-t" }, description = "Get contact info from a tutoring session (returns tutor if you're student, or student if you're tutor)", paramLabel = "<tutoring-id>")
@@ -30,10 +44,25 @@ public class ContactCommand implements Runnable {
    */
   private final ContactService contactService;
 
+  /**
+   * Constructs a new instance of the {@code ContactCommand}.
+   *
+   * @param contactService The service that provides contact-related functionalities.
+   */
   public ContactCommand(ContactService contactService) {
     this.contactService = contactService;
   }
 
+  /**
+   * The main entry point for the command execution.
+   *
+   * <p>
+   * This method handles the logic for retrieving contact information.
+   * It checks for login status, validates that only one option is selected,
+   * and then calls the {@link ContactService} to fetch the data.
+   * Finally, it displays the contact information or an error message.
+   * </p>
+   */
   @Override
   public void run() {
     if (!AuthSession.isLoggedIn()) {
@@ -86,7 +115,14 @@ public class ContactCommand implements Runnable {
   }
 
   /**
-   * Displays contact information with formatted output
+   * Displays contact information with formatted output.
+   *
+   * <p>
+   * Prints the user's ID, name, email, role, and career (if available)
+   * using ANSI colors for better readability.
+   * </p>
+   *
+   * @param contact The {@link ContactInfoDto} object containing the contact details.
    */
   private void displayContactInfo(ContactInfoDto contact) {
     System.out.println(Help.Ansi.AUTO.string("\n@|bold,cyan === Contact Information ===|@\n"));

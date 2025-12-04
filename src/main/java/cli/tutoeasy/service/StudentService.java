@@ -8,10 +8,18 @@ import cli.tutoeasy.model.entities.UserRole;
 import cli.tutoeasy.repository.UserRepository;
 
 /**
+ * <p>
  * Service class for handling student-related operations.
  * This class provides methods for creating, retrieving, updating, and deleting students.
- * It uses a {@link UserRepository} to interact with the database.
+ * </p>
  *
+ * <p>
+ * It uses a {@link UserRepository} to interact with the database, ensuring that all
+ * student-related data persistence is handled correctly.
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
  * @see UserRepository
  * @see CreateStudentDto
  * @see User
@@ -33,10 +41,16 @@ public class StudentService {
     }
 
     /**
-     * Creates a new student.
+     * Creates a new student account.
      *
-     * @param dto The data transfer object containing the student's information.
-     * @return An {@link ActionResponseDto} indicating the result of the operation.
+     * <p>
+     * This method checks if a user with the provided email already exists.
+     * If not, it creates a new user with the 'student' role, hashes the password,
+     * and saves the user to the database.
+     * </p>
+     *
+     * @param dto The data transfer object containing the new student's information (name, email, password).
+     * @return An {@link ActionResponseDto} indicating the result of the operation (success or failure message).
      */
     public ActionResponseDto createStudent(CreateStudentDto dto) {
 
@@ -57,28 +71,40 @@ public class StudentService {
     }
 
     /**
-     * Retrieves a student by their ID.
+     * Retrieves a student by their unique identifier.
      *
-     * @param id The ID of the student to retrieve.
-     * @return The {@link User} object corresponding to the given ID, or {@code null} if not found.
+     * <p>
+     * This method delegates to the {@link UserRepository} to find a user with the given ID.
+     * </p>
+     *
+     * @param id The unique identifier of the student to retrieve.
+     * @return The {@link User} object corresponding to the given ID, or {@code null} if no user is found.
      */
     public User getStudentById(int id) {
         return userRepository.findById(id);
     }
 
     /**
-     * Updates the information of a student.
+     * Updates the information of an existing student.
      *
-     * @param student The student object with the updated information.
+     * <p>
+     * This method delegates to the {@link UserRepository} to persist changes made to the student object.
+     * </p>
+     *
+     * @param student The {@link User} object containing the updated information.
      */
     public void updateStudent(User student) {
         userRepository.update(student);
     }
 
     /**
-     * Deletes a student by their ID.
+     * Deletes a student account by their unique identifier.
      *
-     * @param id The ID of the student to delete.
+     * <p>
+     * This method delegates to the {@link UserRepository} to remove the user with the given ID from the database.
+     * </p>
+     *
+     * @param id The unique identifier of the student to delete.
      */
     public void deleteStudent(int id) {
         userRepository.delete(id);
