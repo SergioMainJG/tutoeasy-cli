@@ -2,14 +2,8 @@ package cli.tutoeasy.service;
 
 import cli.tutoeasy.config.argon2.Argon2Util;
 import cli.tutoeasy.model.dto.*;
-import cli.tutoeasy.model.entities.Tutoring;
-import cli.tutoeasy.model.entities.TutoringStatus;
-import cli.tutoeasy.model.entities.User;
-import cli.tutoeasy.model.entities.UserRole;
-import cli.tutoeasy.repository.NotificationRepository;
-import cli.tutoeasy.repository.TutorRepository;
-import cli.tutoeasy.repository.TutoringRepository;
-import cli.tutoeasy.repository.UserRepository;
+import cli.tutoeasy.model.entities.*;
+import cli.tutoeasy.repository.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -55,6 +49,20 @@ public class TutorService {
      * The service for managing notifications.
      */
     private final NotificationService notificationService;
+    /**
+     * Repository for managing subjects in the database.
+     */
+    private final SubjectRepository subjectRepository;
+
+    /**
+     * Repository for managing the tutor's expertise (subjects linked to tutors).
+     */
+    private final TutorExpertiseRepository expertiseRepository;
+
+    /**
+     * Repository for managing tutors' schedules.
+     */
+    private final TutorScheduleRepository scheduleRepository;
 
     /**
      * Constructs a new instance of the {@code TutorService}.
@@ -68,11 +76,17 @@ public class TutorService {
             UserRepository userRepository,
             TutorRepository tutorRepository,
             TutoringRepository tutoringRepository,
-            NotificationService notificationService) {
+            NotificationService notificationService,
+            SubjectRepository subjectRepository,
+            TutorExpertiseRepository expertiseRepository,
+            TutorScheduleRepository scheduleRepository) {
         this.userRepository = userRepository;
         this.tutorRepository = tutorRepository;
         this.tutoringRepository = tutoringRepository;
         this.notificationService = notificationService;
+        this.subjectRepository = subjectRepository;
+        this.expertiseRepository = expertiseRepository;
+        this.scheduleRepository = scheduleRepository;
     }
 
     /**
@@ -415,5 +429,88 @@ public class TutorService {
         notificationService.addNotification(studentId, message, "TUTORING_UPDATED");
 
         return new ActionResponseDto(true, "Tutoring session updated successfully. Student has been notified.");
+    }
+
+    /**
+     * Updates a tutor's profile including subjects and schedule.
+     *
+     * <p>
+     * This method performs the following operations:
+     * </p>
+     * <ol>
+     *     <li>Validates that the given user ID belongs to a tutor.</li>
+     *     <li>Creates any new subjects provided in the DTO if they do not exist.</li>
+     *     <li>Deletes all existing tutor expertise and adds the new list of subjects.</li>
+     *     <li>Deletes the current schedule and adds the new schedule slots provided in the DTO.</li>
+     * </ol>
+     *
+     * @param dto The data transfer object containing the tutor ID, subjects, and schedule slots.
+     * @return An {@link ActionResponseDto} indicating success or failure of the operation.
+     * @throws IllegalArgumentException if any schedule slot has an invalid day.
+     */
+    public ActionResponseDto editTutorProfile(EditTutorProfileDto dto) {
+        User tutor = userRepository.findById(dto.tutorId());
+        if (tutor == null || tutor.getRol() != UserRole.tutor)
+            return new ActionResponseDto(false, "Invalid tutor.");
+
+        // Subjects
+        List<Subject> subjects = dto.subjectNames().stream()
+                .map(name -> {
+                    Subject s = subjectRepository.findByName(name);
+                    if (s == null) {
+                        s = new Subject();
+                        s.setName(name);
+                        subjectRepository.save(s);
+                    }
+                    return s;
+                })
+                .toList();
+
+        expertiseRepository.deleteByTutor(dto.tutorId());
+        for (Subject s : subjects) {
+            expertiseRepository.addSubjectToTutor(dto.tutorId(), s.getId());
+        }
+
+        // Schedule
+        scheduleRepository.deleteByTutor(dto.tutorId());
+        // Combinar todos los slots en un solo string separado por coma, si vienen en líneas separadas
+        String combinedSlots = String.join(",", dto.scheduleSlots());
+        String[] slots = combinedSlots.split("\\s*,\\s*"); // separa por coma, eliminando espacios
+
+        for (String slot : slots) {
+            String[] parts = slot.split("-");
+            if (parts.length != 3) continue; // ignorar si no tiene formato correcto
+            TutorSchedule ts = new TutorSchedule();
+            ts.setTutor(tutor);
+            ts.setDayOfWeek(convertDayToNumber(parts[0].trim())); // convertDayToNumber hace .toLowerCase()
+            ts.setStartTime(LocalTime.parse(parts[1].trim()));
+            ts.setEndTime(LocalTime.parse(parts[2].trim()));
+            scheduleRepository.save(ts);
+        }
+
+        return new ActionResponseDto(true, "Tutor profile updated successfully.");
+    }
+    /**
+     * Converts a day of the week from its name to a numeric representation.
+     *
+     * <p>
+     * Monday = 1, Tuesday = 2, ..., Sunday = 7.
+     * </p>
+     *
+     * @param day The name of the day (case-insensitive).
+     * @return The numeric representation of the day.
+     * @throws IllegalArgumentException if the day name is invalid.
+     */
+    private int convertDayToNumber(String day) {
+        return switch (day.toLowerCase()) {
+            case "monday" -> 1;
+            case "tuesday" -> 2;
+            case "wednesday" -> 3;
+            case "thursday" -> 4;
+            case "friday" -> 5;
+            case "saturday" -> 6;
+            case "sunday" -> 7;
+            default -> throw new IllegalArgumentException("Invalid day: " + day);
+        };
     }
 }
