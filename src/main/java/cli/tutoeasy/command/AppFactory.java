@@ -15,12 +15,19 @@ import cli.tutoeasy.service.*;
 import picocli.CommandLine;
 
 /**
+ * <p>
  * A factory for creating instances of commands and their dependencies.
  * This class is responsible for instantiating and wiring together the various
  * services and repositories required by the application's commands.
- * It implements the {@link CommandLine.IFactory} interface to integrate with
- * the picocli framework.
+ * </p>
  *
+ * <p>
+ * It implements the {@link CommandLine.IFactory} interface to integrate with
+ * the picocli framework, allowing for dependency injection into command classes.
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
  * @see CommandLine.IFactory
  */
 public class AppFactory implements CommandLine.IFactory {
@@ -106,11 +113,11 @@ public class AppFactory implements CommandLine.IFactory {
         this.topicRepository = new TopicRepository();
         this.authService = new AuthService(userRepository);
         this.studentService = new StudentService(userRepository);
-        this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository, notificationRepository);
         this.adminService = new AdministratorService(userRepository);
         this.contactService = new ContactService(contactRepository, tutoringRepository);
         this.messageService = new MessageService(messageRepository, contactRepository, notificationRepository);
         this.notificationService = new NotificationService(notificationRepository, userRepository);
+        this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository, notificationService);
         this.studentTutoringService = new StudentTutoringService(tutoringRepository, userRepository, subjectRepository, contactRepository, notificationService, topicRepository);
     }
 

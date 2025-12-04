@@ -7,10 +7,17 @@ import cli.tutoeasy.model.entities.UserRole;
 import cli.tutoeasy.repository.UserRepository;
 
 /**
- * Service class for handling user-related operations.
- * This class provides methods for creating users.
- * It uses a {@link UserRepository} to interact with the database.
+ * <p>
+ * Service class for handling general user-related operations.
+ * This class provides methods for creating generic users.
+ * </p>
  *
+ * <p>
+ * It uses a {@link UserRepository} to interact with the database.
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
  * @see UserRepository
  * @see CreateUserDto
  * @see User
@@ -32,9 +39,14 @@ public class UserService {
     }
 
     /**
-     * Creates a new user.
+     * Creates a new user account with a specified role.
      *
-     * @param dto The data transfer object containing the user's information.
+     * <p>
+     * This method creates a new user entity, hashes the password using Argon2,
+     * assigns the specified role, and saves the user to the database.
+     * </p>
+     *
+     * @param dto The data transfer object containing the new user's information (username, email, password, role).
      */
     public void createUser(CreateUserDto dto) {
 

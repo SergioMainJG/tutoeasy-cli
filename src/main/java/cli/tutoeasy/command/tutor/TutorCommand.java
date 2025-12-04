@@ -7,10 +7,19 @@ import cli.tutoeasy.util.validations.ValidationsMessages;
 import picocli.CommandLine.*;
 
 /**
+ * <p>
  * Represents the command for creating a new tutor.
  * This class provides the functionality to register a new tutor by providing their name, email, and password.
- * It is a subcommand of the main application and is accessible through the "create-tutor" command.
+ * </p>
  *
+ * <p>
+ * It is a subcommand of the main application and is accessible through the "create-tutor" command.
+ * Unlike the admin creation command, this command might be accessible publicly or have different restrictions
+ * depending on the application configuration.
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
  * @see TutorService
  * @see CreateTutorDto
  */
@@ -22,27 +31,31 @@ import picocli.CommandLine.*;
 public class TutorCommand implements Runnable {
 
     /**
-     * The command specification, used to access command-line properties.
+     * The command specification, used to access command-line properties and the
+     * command line instance itself for error reporting.
      */
     @Spec
     Model.CommandSpec spec;
 
     /**
-     * The name of the tutor.
+     * The full name of the new tutor.
+     * This option is mandatory.
      */
-    @Option(names = {"--name", "-n"}, required = true)
+    @Option(names = {"--name", "-n"}, required = true, description = "The full name of the tutor")
     private String name;
 
     /**
-     * The email of the tutor.
+     * The email address of the new tutor.
+     * This option is mandatory and must follow a valid email format for students/tutors.
      */
-    @Option(names = {"--email", "-e"}, required = true)
+    @Option(names = {"--email", "-e"}, required = true, description = "The email address of the tutor")
     private String email;
 
     /**
-     * The password of the tutor.
+     * The password for the new tutor account.
+     * This option is mandatory and interactive, prompting the user for secure input.
      */
-    @Option(names = {"--password", "-p"}, required = true, interactive = true)
+    @Option(names = {"--password", "-p"}, required = true, interactive = true, description = "The password for the tutor")
     private String password;
 
     /**
@@ -60,8 +73,21 @@ public class TutorCommand implements Runnable {
     }
 
     /**
-     * The main entry point for the command execution. This method handles the logic
-     * for creating a new tutor, including input validation and calling the {@link TutorService}.
+     * The main entry point for the command execution.
+     *
+     * <p>
+     * This method handles the logic for creating a new tutor. It performs the following steps:
+     * </p>
+     * <ul>
+     *     <li>Validates the input parameters (name, email, password) using {@link CommonValidation}.</li>
+     *     <li>Calls the {@link TutorService} to register the new tutor.</li>
+     *     <li>Displays the result (success or error message) to the console.</li>
+     * </ul>
+     *
+     * <p>
+     * If any validation fails, a {@link ParameterException} is thrown and caught to display
+     * a user-friendly error message.
+     * </p>
      */
     @Override
     public void run() {
