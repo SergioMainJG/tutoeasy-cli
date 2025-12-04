@@ -15,26 +15,47 @@ import java.util.List;
 @Command(name = "message", description = "Send and receive messages", mixinStandardHelpOptions = true)
 public class MessageCommand implements Runnable {
 
+  /**
+   * Send a message to a user (requires --text).
+   */
   @Option(names = { "--to",
       "-t" }, description = "Send a message to a user (requires --text)", paramLabel = "<username>")
   private String toUsername;
 
+  /**
+   * Message content (required with --to).
+   */
   @Option(names = { "--text", "-m" }, description = "Message content (required with --to)", paramLabel = "<message>")
   private String messageText;
 
+  /**
+   * View messages from a specific user.
+   */
   @Option(names = { "--from", "-f" }, description = "View messages from a specific user", paramLabel = "<username>")
   private String fromUsername;
 
+  /**
+   * View all received messages.
+   */
   @Option(names = { "--inbox", "-i" }, description = "View all received messages")
   private boolean showInbox;
 
+  /**
+   * View only unread messages.
+   */
   @Option(names = { "--unread", "-u" }, description = "View only unread messages")
   private boolean showUnread;
 
+  /**
+   * View full conversation with a user.
+   */
   @Option(names = { "--conversation",
       "-c" }, description = "View full conversation with a user", paramLabel = "<username>")
   private String conversationUsername;
 
+  /**
+   * The service responsible for handling message-related operations.
+   */
   private final MessageService messageService;
 
   public MessageCommand(MessageService messageService) {

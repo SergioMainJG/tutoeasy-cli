@@ -92,7 +92,7 @@ CREATE TABLE Notifications (
     userId INT NOT NULL,
     message TEXT NOT NULL,
     createdAt DATETIME NOT NULL,
-    wasReaded BOOLEAN DEFAULT FALSE,
+    wasRead BOOLEAN DEFAULT FALSE,
     type VARCHAR(20),
     FOREIGN KEY (userId) REFERENCES Users(id)
 );
@@ -139,7 +139,7 @@ CREATE INDEX idx_message_created ON Messages(createdAt);
 CREATE INDEX idx_message_conversation ON Messages(senderId, receiverId, createdAt);
 
 CREATE INDEX idx_notification_user ON Notifications(userId);
-CREATE INDEX idx_notification_user_read ON Notifications(userId, wasReaded);
+CREATE INDEX idx_notification_user_read ON Notifications(userId, wasRead);
 CREATE INDEX idx_notification_created ON Notifications(createdAt);
 CREATE INDEX idx_notification_type ON Notifications(type);
 

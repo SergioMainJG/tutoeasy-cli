@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "Notifications", indexes = {
-    @Index(name = "idx_notification_user", columnList = "userId"),
-    @Index(name = "idx_notification_user_read", columnList = "userId, wasReaded"),
+    @Index(name = "idx_notification_user_read", columnList = "userId, wasRead"),
     @Index(name = "idx_notification_created", columnList = "createdAt")
 })
 @Getter
@@ -48,10 +47,10 @@ public class Notification {
     private LocalDateTime createdAt;
 
     /**
-     * A flag indicating whether the notification has been read.
+     * Whether the notification has been read.
      */
     @Column(nullable = false)
-    private boolean wasReaded = false;
+    private boolean wasRead = false;
 
     /**
      * The type of the notification.

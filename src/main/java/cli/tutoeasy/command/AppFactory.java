@@ -3,15 +3,14 @@ package cli.tutoeasy.command;
 import cli.tutoeasy.command.admin.AdminCommand;
 import cli.tutoeasy.command.global.ContactCommand;
 import cli.tutoeasy.command.global.MessageCommand;
+import cli.tutoeasy.command.global.NotificationCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.student.StudentCommand;
+import cli.tutoeasy.command.student.StudentHistoryCommand;
+import cli.tutoeasy.command.student.StudentRequestCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
-import cli.tutoeasy.repository.ContactRepository;
-import cli.tutoeasy.repository.MessageRepository;
-import cli.tutoeasy.repository.TutorRepository;
-import cli.tutoeasy.repository.TutoringRepository;
-import cli.tutoeasy.repository.UserRepository;
+import cli.tutoeasy.repository.*;
 import cli.tutoeasy.service.*;
 import picocli.CommandLine;
 
@@ -47,6 +46,18 @@ public class AppFactory implements CommandLine.IFactory {
      */
     private final MessageRepository messageRepository;
     /**
+     * The repository for managing notification data.
+     */
+    private final NotificationRepository notificationRepository;
+    /**
+     * The repository for managing subject data.
+     */
+    private final SubjectRepository subjectRepository;
+    /**
+     * The repository for managing topic data.
+     */
+    private final TopicRepository topicRepository;
+    /**
      * The service for student-related operations.
      */
     private final StudentService studentService;
@@ -66,8 +77,18 @@ public class AppFactory implements CommandLine.IFactory {
      * The service for contact-related operations.
      */
     private final ContactService contactService;
-
+    /**
+     * The service for message-related operations.
+     */
     private final MessageService messageService;
+    /**
+     * The service for notification-related operations.
+     */
+    private final NotificationService notificationService;
+    /**
+     * The service for student tutoring-related operations.
+     */
+    private final StudentTutoringService studentTutoringService;
 
     /**
      * Constructs a new instance of the {@code AppFactory}.
@@ -75,18 +96,22 @@ public class AppFactory implements CommandLine.IFactory {
      * the application.
      */
     public AppFactory() {
-
         this.userRepository = new UserRepository();
         this.tutorRepository = new TutorRepository();
         this.tutoringRepository = new TutoringRepository();
         this.contactRepository = new ContactRepository();
         this.messageRepository = new MessageRepository();
+        this.notificationRepository = new NotificationRepository();
+        this.subjectRepository = new SubjectRepository();
+        this.topicRepository = new TopicRepository();
         this.authService = new AuthService(userRepository);
         this.studentService = new StudentService(userRepository);
-        this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository);
+        this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository, notificationRepository);
         this.adminService = new AdministratorService(userRepository);
         this.contactService = new ContactService(contactRepository, tutoringRepository);
-        this.messageService = new MessageService(messageRepository, contactRepository);
+        this.messageService = new MessageService(messageRepository, contactRepository, notificationRepository);
+        this.notificationService = new NotificationService(notificationRepository, userRepository);
+        this.studentTutoringService = new StudentTutoringService(tutoringRepository, userRepository, subjectRepository, contactRepository, notificationService, topicRepository);
     }
 
     /**
@@ -129,6 +154,18 @@ public class AppFactory implements CommandLine.IFactory {
 
         if (cls == MessageCommand.class) {
             return (K) new MessageCommand(messageService);
+        }
+
+        if (cls == NotificationCommand.class) {
+            return (K) new NotificationCommand(notificationService);
+        }
+
+        if (cls == StudentRequestCommand.class ){
+            return (K) new StudentRequestCommand(studentTutoringService);
+        }
+
+        if (cls == StudentHistoryCommand.class) {
+            return (K) new StudentHistoryCommand(studentTutoringService);
         }
 
         return cls.getDeclaredConstructor().newInstance();

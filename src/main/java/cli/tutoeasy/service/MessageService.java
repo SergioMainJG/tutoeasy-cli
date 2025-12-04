@@ -5,6 +5,7 @@ import cli.tutoeasy.model.entities.Message;
 import cli.tutoeasy.model.entities.User;
 import cli.tutoeasy.repository.ContactRepository;
 import cli.tutoeasy.repository.MessageRepository;
+import cli.tutoeasy.repository.NotificationRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,21 +19,22 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
     private final ContactRepository contactRepository;
+    private final NotificationRepository notificationRepository;
 
-    public MessageService(MessageRepository messageRepository, ContactRepository contactRepository) {
+    public MessageService(MessageRepository messageRepository, ContactRepository contactRepository, NotificationRepository notificationRepository) {
         this.messageRepository = messageRepository;
         this.contactRepository = contactRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     /**
      * Sends a message to another user
-     * 
+     *
      * @param senderId ID of the sender
      * @param dto      DTO containing receiver username and message content
      * @return ActionResponseDto indicating success or failure
      */
     public ActionResponseDto sendMessage(int senderId, SendMessageDto dto) {
-        // Validate message content
         if (dto.content() == null || dto.content().trim().isEmpty()) {
             return new ActionResponseDto(false, "Message content cannot be empty.");
         }
@@ -62,6 +64,11 @@ public class MessageService {
         message.setCreatedAt(LocalDateTime.now());
         message.setWasRead(false);
 
+        String notificationMessage = String.format(
+                "New message from %s",
+                sender.getUsername());
+        notificationRepository.createNotification(receiver, notificationMessage, "MESSAGE_RECEIVED");
+
         messageRepository.save(message);
 
         return new ActionResponseDto(true, "Message sent to " + dto.receiverUsername() + " successfully.");
@@ -69,7 +76,7 @@ public class MessageService {
 
     /**
      * Gets all received messages (inbox)
-     * 
+     *
      * @param userId ID of the user
      * @return List of received messages
      */
@@ -89,7 +96,7 @@ public class MessageService {
 
     /**
      * Gets messages from a specific user
-     * 
+     *
      * @param receiverId     ID of current user
      * @param senderUsername Username of the sender
      * @return List of messages from that user
@@ -119,7 +126,7 @@ public class MessageService {
 
     /**
      * Gets full conversation between current user and another user
-     * 
+     *
      * @param currentUserId ID of current user
      * @param otherUsername Username of the other user
      * @return List of messages in chronological order
@@ -152,7 +159,7 @@ public class MessageService {
 
     /**
      * Gets count of unread messages
-     * 
+     *
      * @param userId ID of the user
      * @return Number of unread messages
      */
@@ -162,7 +169,7 @@ public class MessageService {
 
     /**
      * Gets list of unread messages
-     * 
+     *
      * @param userId ID of the user
      * @return List of unread messages
      */
@@ -182,7 +189,7 @@ public class MessageService {
 
     /**
      * Marks a specific message as read
-     * 
+     *
      * @param messageId ID of the message
      * @param userId    ID of the user (to verify ownership)
      * @return ActionResponseDto indicating success
