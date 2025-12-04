@@ -266,4 +266,30 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
             return query.getResultList();
         });
     }
+
+    /**
+     * Finds upcoming confirmed tutoring sessions for a tutor (future sessions).
+     * Only returns confirmed sessions.
+     *
+     * @param tutorId ID of the tutor
+     * @return List of upcoming confirmed tutoring sessions
+     */
+    public List<Tutoring> findUpcomingByTutor(int tutorId) {
+        LocalDate today = LocalDate.now();
+        return executeQuery(em -> em.createQuery("""
+                SELECT t FROM Tutoring t
+                LEFT JOIN FETCH t.student
+                LEFT JOIN FETCH t.tutor
+                LEFT JOIN FETCH t.subject
+                LEFT JOIN FETCH t.topic
+                WHERE t.tutor.id = :tutorId
+                AND t.meetingDate >= :today
+                AND t.status = :confirmedStatus
+                ORDER BY t.meetingDate ASC, t.meetingTime ASC
+                """, Tutoring.class)
+                .setParameter("tutorId", tutorId)
+                .setParameter("today", today)
+                .setParameter("confirmedStatus", TutoringStatus.confirmed)
+                .getResultList());
+    }
 }

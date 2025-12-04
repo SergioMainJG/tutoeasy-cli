@@ -16,10 +16,19 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 /**
+ * <p>
  * The root command of the TutoEasy CLI application.
  * This class serves as the entry point for all other commands and provides a
  * brief description of the application.
- * It also handles the case where no subcommand is specified.
+ * </p>
+ *
+ * <p>
+ * It also handles the case where no subcommand is specified, displaying the
+ * current session status and guidance on how to proceed.
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
  */
 @Command(name = "tutoeasy", description = "CLI Application as TutoEasy Service", subcommands = {
         LoginCommand.class,
@@ -39,6 +48,11 @@ public class RootCommand implements Runnable {
      * The main entry point for the root command execution.
      * This method displays the current session status and provides guidance on how
      * to proceed.
+     *
+     * <p>
+     * It checks if a user is logged in and displays a welcome message or a prompt
+     * to login accordingly.
+     * </p>
      */
     @Override
     public void run() {
