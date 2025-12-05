@@ -17,6 +17,36 @@
     </properties>
     <dependencies>
 
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>5.5.1</version>
+        </dependency>
+
+        <!-- =======================
+             HikariCP (Pool de conexiones)
+        ======================== -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-hikaricp</artifactId>
+            <version>6.4.1.Final</version>
+        </dependency>
+
+        <!-- =======================
+             Cache
+        ======================== -->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>4.0.0</version>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- =======================
          GSON to drive JSON
     ======================== -->
@@ -54,7 +84,6 @@
             <version>4.7.7</version>
         </dependency>
 
-        <!-- Needed if you want to generate a single runnable JAR -->
         <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli-codegen</artifactId>
@@ -95,15 +124,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- =======================
-             JUnit (TDD)
-        ======================== -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.10.2</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <!-- =======================
@@ -146,7 +166,6 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <!-- Cambia esto por tu clase Main -->
                             <mainClass>cli.tutoeasy.Main</mainClass>
                         </manifest>
                     </archive>

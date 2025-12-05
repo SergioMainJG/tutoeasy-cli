@@ -92,7 +92,7 @@ CREATE TABLE Notifications (
     userId INT NOT NULL,
     message TEXT NOT NULL,
     createdAt DATETIME NOT NULL,
-    wasReaded BOOLEAN DEFAULT FALSE,
+    wasRead BOOLEAN DEFAULT FALSE,
     type VARCHAR(20),
     FOREIGN KEY (userId) REFERENCES Users(id)
 );
@@ -105,3 +105,67 @@ CREATE TABLE Reports (
     createdAt DATETIME NOT NULL,
     FOREIGN KEY (createdByAdmin) REFERENCES Users(id)
 );
+
+CREATE INDEX idx_tutoring_tutor_status ON Tutorings(tutorId, status);
+CREATE INDEX idx_tutoring_schedule ON Tutorings(tutorId, meetingDate, meetingTime, status);
+
+CREATE INDEX idx_user_email ON Users(email);
+CREATE INDEX idx_user_username ON Users(username);
+CREATE INDEX idx_user_role ON Users(rol);
+
+CREATE INDEX idx_topic_subject ON Topics(subjectId);
+
+CREATE INDEX idx_expertise_tutor ON TutorExpertise(tutorId);
+CREATE INDEX idx_expertise_subject ON TutorExpertise(subjectId);
+
+CREATE INDEX idx_schedule_tutor ON TutorSchedule(tutorId);
+CREATE INDEX idx_schedule_tutor_day ON TutorSchedule(tutorId, dayOfWeek);
+
+CREATE INDEX idx_tutoring_student ON Tutorings(studentId);
+CREATE INDEX idx_tutoring_subject ON Tutorings(subjectId);
+CREATE INDEX idx_tutoring_date ON Tutorings(meetingDate);
+CREATE INDEX idx_tutoring_student_status ON Tutorings(studentId, status);
+
+CREATE INDEX idx_feedback_tutoring ON SessionFeedback(tutoringId);
+CREATE INDEX idx_feedback_student ON SessionFeedback(studentId);
+CREATE INDEX idx_feedback_tutor ON SessionFeedback(tutorId);
+CREATE INDEX idx_feedback_created ON SessionFeedback(createdAt);
+CREATE INDEX idx_feedback_tutor_rating ON SessionFeedback(tutorId, rating);
+
+CREATE INDEX idx_message_sender ON Messages(senderId);
+CREATE INDEX idx_message_receiver ON Messages(receiverId);
+CREATE INDEX idx_message_receiver_read ON Messages(receiverId, wasRead);
+CREATE INDEX idx_message_created ON Messages(createdAt);
+CREATE INDEX idx_message_conversation ON Messages(senderId, receiverId, createdAt);
+
+CREATE INDEX idx_notification_user ON Notifications(userId);
+CREATE INDEX idx_notification_user_read ON Notifications(userId, wasRead);
+CREATE INDEX idx_notification_created ON Notifications(createdAt);
+CREATE INDEX idx_notification_type ON Notifications(type);
+
+CREATE INDEX idx_report_admin ON Reports(createdByAdmin);
+CREATE INDEX idx_report_type ON Reports(reportType);
+CREATE INDEX idx_report_created ON Reports(createdAt);
+
+ANALYZE TABLE Users;
+ANALYZE TABLE Careers;
+ANALYZE TABLE Subjects;
+ANALYZE TABLE Topics;
+ANALYZE TABLE TutorExpertise;
+ANALYZE TABLE TutorSchedule;
+ANALYZE TABLE Tutorings;
+ANALYZE TABLE SessionFeedback;
+ANALYZE TABLE Messages;
+ANALYZE TABLE Notifications;
+ANALYZE TABLE Reports;
+
+ALTER TABLE Users ADD INDEX idx_users_email (email);
+ALTER TABLE Users ADD INDEX idx_users_username (username);
+ALTER TABLE Users ADD INDEX idx_users_email_rol (email, rol);
+SHOW INDEX FROM Users;
+ANALYZE TABLE Users;
+
+SHOW VARIABLES LIKE 'table_open_cache';
+SHOW VARIABLES LIKE 'skip_name_resolve';
+SHOW VARIABLES LIKE 'performance_schema';
+SHOW VARIABLES LIKE 'innodb_file_per_table';

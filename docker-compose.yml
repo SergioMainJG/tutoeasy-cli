@@ -12,3 +12,4 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - ./tutoeasy-mysql:/var/lib/mysql
+      - ./my.ini:/etc/my.ini
