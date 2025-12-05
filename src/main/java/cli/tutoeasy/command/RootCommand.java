@@ -12,6 +12,7 @@ import cli.tutoeasy.command.student.StudentRequestCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
 import cli.tutoeasy.config.session.AuthSession;
+import cli.tutoeasy.command.tutor.EditTutorProfileCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -41,7 +42,8 @@ import picocli.CommandLine.Command;
         MessageCommand.class,
         StudentRequestCommand.class,
         NotificationCommand.class,
-        StudentHistoryCommand.class
+        StudentHistoryCommand.class,
+        EditTutorProfileCommand.class
 }, mixinStandardHelpOptions = true)
 public class RootCommand implements Runnable {
     /**
