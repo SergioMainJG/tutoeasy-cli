@@ -9,6 +9,7 @@ import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.student.StudentCommand;
 import cli.tutoeasy.command.student.StudentHistoryCommand;
 import cli.tutoeasy.command.student.StudentRequestCommand;
+import cli.tutoeasy.command.tutor.EditTutorProfileCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
 import cli.tutoeasy.repository.*;
@@ -107,6 +108,15 @@ public class AppFactory implements CommandLine.IFactory {
     private final ReportService reportService;
 
     /**
+     * The repository for managing tutors' subjects (expertise) data.
+     */
+    private final TutorExpertiseRepository expertiseRepository;
+
+    /**
+     * The repository for managing tutors' schedule data.
+     */
+    private final TutorScheduleRepository scheduleRepository;
+    /**
      * Constructs a new instance of the {@code AppFactory}.
      * This constructor initializes all the repositories and services required by
      * the application.
@@ -127,7 +137,9 @@ public class AppFactory implements CommandLine.IFactory {
         this.contactService = new ContactService(contactRepository, tutoringRepository);
         this.messageService = new MessageService(messageRepository, contactRepository, notificationRepository);
         this.notificationService = new NotificationService(notificationRepository, userRepository);
-        this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository, notificationService);
+        this.expertiseRepository = new TutorExpertiseRepository();
+        this.scheduleRepository = new TutorScheduleRepository();
+        this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository, notificationService,subjectRepository,expertiseRepository, scheduleRepository);
         this.studentTutoringService = new StudentTutoringService(tutoringRepository, userRepository, subjectRepository, contactRepository, notificationService, topicRepository);
         this.reportService = new ReportService(reportRepository, userRepository);
     }
@@ -184,6 +196,9 @@ public class AppFactory implements CommandLine.IFactory {
 
         if (cls == StudentHistoryCommand.class) {
             return (K) new StudentHistoryCommand(studentTutoringService);
+        }
+        if (cls == EditTutorProfileCommand.class){
+            return (K) new EditTutorProfileCommand(tutorService);
         }
 
         if (cls == ReportCommand.class) {
