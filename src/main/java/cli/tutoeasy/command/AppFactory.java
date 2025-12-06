@@ -1,6 +1,7 @@
 package cli.tutoeasy.command;
 
 import cli.tutoeasy.command.admin.AdminCommand;
+import cli.tutoeasy.command.admin.ReportCommand;
 import cli.tutoeasy.command.global.ContactCommand;
 import cli.tutoeasy.command.global.MessageCommand;
 import cli.tutoeasy.command.global.NotificationCommand;
@@ -65,6 +66,10 @@ public class AppFactory implements CommandLine.IFactory {
      */
     private final TopicRepository topicRepository;
     /**
+     * The repository for managing repors
+     */
+    private final ReportRepository reportRepository;
+    /**
      * The service for student-related operations.
      */
     private final StudentService studentService;
@@ -96,6 +101,10 @@ public class AppFactory implements CommandLine.IFactory {
      * The service for student tutoring-related operations.
      */
     private final StudentTutoringService studentTutoringService;
+    /**
+     * The service for student reportService
+     */
+    private final ReportService reportService;
 
     /**
      * Constructs a new instance of the {@code AppFactory}.
@@ -111,6 +120,7 @@ public class AppFactory implements CommandLine.IFactory {
         this.notificationRepository = new NotificationRepository();
         this.subjectRepository = new SubjectRepository();
         this.topicRepository = new TopicRepository();
+        this.reportRepository = new ReportRepository();
         this.authService = new AuthService(userRepository);
         this.studentService = new StudentService(userRepository);
         this.adminService = new AdministratorService(userRepository);
@@ -119,6 +129,7 @@ public class AppFactory implements CommandLine.IFactory {
         this.notificationService = new NotificationService(notificationRepository, userRepository);
         this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository, notificationService);
         this.studentTutoringService = new StudentTutoringService(tutoringRepository, userRepository, subjectRepository, contactRepository, notificationService, topicRepository);
+        this.reportService = new ReportService(reportRepository, userRepository);
     }
 
     /**
@@ -173,6 +184,10 @@ public class AppFactory implements CommandLine.IFactory {
 
         if (cls == StudentHistoryCommand.class) {
             return (K) new StudentHistoryCommand(studentTutoringService);
+        }
+
+        if (cls == ReportCommand.class) {
+            return (K) new ReportCommand(reportService);
         }
 
         return cls.getDeclaredConstructor().newInstance();

@@ -1,6 +1,7 @@
 package cli.tutoeasy.command;
 
 import cli.tutoeasy.command.admin.AdminCommand;
+import cli.tutoeasy.command.admin.ReportCommand;
 import cli.tutoeasy.command.global.ContactCommand;
 import cli.tutoeasy.command.global.MessageCommand;
 import cli.tutoeasy.command.global.NotificationCommand;
@@ -41,7 +42,8 @@ import picocli.CommandLine.Command;
         MessageCommand.class,
         StudentRequestCommand.class,
         NotificationCommand.class,
-        StudentHistoryCommand.class
+        StudentHistoryCommand.class,
+        ReportCommand.class
 }, mixinStandardHelpOptions = true)
 public class RootCommand implements Runnable {
     /**
