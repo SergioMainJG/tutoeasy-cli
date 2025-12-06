@@ -4,6 +4,7 @@ import cli.tutoeasy.command.admin.AdminCommand;
 import cli.tutoeasy.command.global.ContactCommand;
 import cli.tutoeasy.command.global.MessageCommand;
 import cli.tutoeasy.command.global.NotificationCommand;
+import cli.tutoeasy.command.global.ProfileCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.student.StudentCommand;
 import cli.tutoeasy.command.student.StudentHistoryCommand;
@@ -27,8 +28,8 @@ import picocli.CommandLine;
  * </p>
  *
  * @version 1.0
- * @since 1.0
  * @see CommandLine.IFactory
+ * @since 1.0
  */
 public class AppFactory implements CommandLine.IFactory {
 
@@ -65,6 +66,10 @@ public class AppFactory implements CommandLine.IFactory {
      */
     private final TopicRepository topicRepository;
     /**
+     * The repository for managing career data.
+     */
+    private final CareerRepository careerRepository;
+    /**
      * The service for student-related operations.
      */
     private final StudentService studentService;
@@ -96,11 +101,19 @@ public class AppFactory implements CommandLine.IFactory {
      * The service for student tutoring-related operations.
      */
     private final StudentTutoringService studentTutoringService;
+    /**
+     * The service for profile-related operations.
+     */
+    private final ProfileService profileService;
 
     /**
+     * <p>
      * Constructs a new instance of the {@code AppFactory}.
+     * </p>
+     * <p>
      * This constructor initializes all the repositories and services required by
      * the application.
+     * </p>
      */
     public AppFactory() {
         this.userRepository = new UserRepository();
@@ -111,6 +124,7 @@ public class AppFactory implements CommandLine.IFactory {
         this.notificationRepository = new NotificationRepository();
         this.subjectRepository = new SubjectRepository();
         this.topicRepository = new TopicRepository();
+        this.careerRepository = new CareerRepository();
         this.authService = new AuthService(userRepository);
         this.studentService = new StudentService(userRepository);
         this.adminService = new AdministratorService(userRepository);
@@ -119,6 +133,7 @@ public class AppFactory implements CommandLine.IFactory {
         this.notificationService = new NotificationService(notificationRepository, userRepository);
         this.tutorService = new TutorService(userRepository, tutorRepository, tutoringRepository, notificationService);
         this.studentTutoringService = new StudentTutoringService(tutoringRepository, userRepository, subjectRepository, contactRepository, notificationService, topicRepository);
+        this.profileService = new ProfileService(userRepository, careerRepository);
     }
 
     /**
@@ -167,12 +182,16 @@ public class AppFactory implements CommandLine.IFactory {
             return (K) new NotificationCommand(notificationService);
         }
 
-        if (cls == StudentRequestCommand.class ){
+        if (cls == StudentRequestCommand.class) {
             return (K) new StudentRequestCommand(studentTutoringService);
         }
 
         if (cls == StudentHistoryCommand.class) {
             return (K) new StudentHistoryCommand(studentTutoringService);
+        }
+
+        if (cls == ProfileCommand.class) {
+            return (K) new ProfileCommand(profileService);
         }
 
         return cls.getDeclaredConstructor().newInstance();

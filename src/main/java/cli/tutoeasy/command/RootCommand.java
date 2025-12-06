@@ -4,6 +4,7 @@ import cli.tutoeasy.command.admin.AdminCommand;
 import cli.tutoeasy.command.global.ContactCommand;
 import cli.tutoeasy.command.global.MessageCommand;
 import cli.tutoeasy.command.global.NotificationCommand;
+import cli.tutoeasy.command.global.ProfileCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.session.LogoutCommand;
 import cli.tutoeasy.command.student.StudentCommand;
@@ -41,13 +42,18 @@ import picocli.CommandLine.Command;
         MessageCommand.class,
         StudentRequestCommand.class,
         NotificationCommand.class,
-        StudentHistoryCommand.class
+        StudentHistoryCommand.class,
+        ProfileCommand.class,
 }, mixinStandardHelpOptions = true)
 public class RootCommand implements Runnable {
     /**
+     * <p>
      * The main entry point for the root command execution.
+     * </p>
+     * <p>
      * This method displays the current session status and provides guidance on how
      * to proceed.
+     * </p>
      *
      * <p>
      * It checks if a user is logged in and displays a welcome message or a prompt
