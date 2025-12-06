@@ -1,19 +1,21 @@
 package cli.tutoeasy.command;
 
 import cli.tutoeasy.command.admin.AdminCommand;
-import cli.tutoeasy.command.admin.ReportCommand;
+import cli.tutoeasy.command.admin.ReportCommand; 
 import cli.tutoeasy.command.global.ContactCommand;
 import cli.tutoeasy.command.global.MessageCommand;
 import cli.tutoeasy.command.global.NotificationCommand;
+import cli.tutoeasy.command.global.ProfileCommand; 
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.session.LogoutCommand;
 import cli.tutoeasy.command.student.StudentCommand;
 import cli.tutoeasy.command.student.StudentHistoryCommand;
 import cli.tutoeasy.command.student.StudentRequestCommand;
+import cli.tutoeasy.command.tutor.EditTutorProfileCommand; 
 import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
+
 import cli.tutoeasy.config.session.AuthSession;
-import cli.tutoeasy.command.tutor.EditTutorProfileCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -39,19 +41,24 @@ import picocli.CommandLine.Command;
         TutorCommand.class,
         AdminCommand.class,
         TutorRequestCommand.class,
+        StudentRequestCommand.class,
         ContactCommand.class,
         MessageCommand.class,
-        StudentRequestCommand.class,
         NotificationCommand.class,
+        ProfileCommand.class, 
         StudentHistoryCommand.class,
-        ReportCommand.class
+        ReportCommand.class,           
         EditTutorProfileCommand.class
 }, mixinStandardHelpOptions = true)
 public class RootCommand implements Runnable {
     /**
+     * <p>
      * The main entry point for the root command execution.
+     * </p>
+     * <p>
      * This method displays the current session status and provides guidance on how
      * to proceed.
+     * </p>
      *
      * <p>
      * It checks if a user is logged in and displays a welcome message or a prompt
