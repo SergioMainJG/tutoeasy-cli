@@ -8,9 +8,11 @@ import cli.tutoeasy.command.global.NotificationCommand;
 import cli.tutoeasy.command.global.ProfileCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.student.StudentCommand;
+import cli.tutoeasy.command.student.RateSessionCommand;
 import cli.tutoeasy.command.student.StudentHistoryCommand;
 import cli.tutoeasy.command.student.StudentRequestCommand;
 import cli.tutoeasy.command.tutor.EditTutorProfileCommand;
+import cli.tutoeasy.command.tutor.RateStudentCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
 import cli.tutoeasy.repository.*;
@@ -125,6 +127,18 @@ public class AppFactory implements CommandLine.IFactory {
      * The repository for managing tutors' schedule data.
      */
     private final TutorScheduleRepository scheduleRepository;
+
+    /**
+     * Repository responsible for managing tutoring session feedback persistence.
+     */
+    private final SessionFeedbackRepository feedbackRepository;
+
+    /**
+     * Service responsible for handling business logic related to
+     * tutoring session feedback.
+     */
+    private final SessionFeedbackService feedbackService;
+
     /**
      * <p>
      * Constructs a new instance of the {@code AppFactory}.
@@ -157,6 +171,8 @@ public class AppFactory implements CommandLine.IFactory {
         this.studentTutoringService = new StudentTutoringService(tutoringRepository, userRepository, subjectRepository, contactRepository, notificationService, topicRepository);
         this.profileService = new ProfileService(userRepository, careerRepository);
         this.reportService = new ReportService(reportRepository, userRepository);
+        this.feedbackRepository = new SessionFeedbackRepository();
+        this.feedbackService = new SessionFeedbackService( feedbackRepository, tutoringRepository);
     }
 
     /**
@@ -215,7 +231,18 @@ public class AppFactory implements CommandLine.IFactory {
         if (cls == EditTutorProfileCommand.class){
             return (K) new EditTutorProfileCommand(tutorService);
         }
-
+        if (cls == ReportCommand.class) {
+            return (K) new ReportCommand(reportService);
+        }
+        if (cls == ProfileCommand.class) {
+            return (K) new ProfileCommand(profileService);
+        }
+        if (cls == RateStudentCommand.class) {
+            return (K) new RateStudentCommand(feedbackService);
+        }
+        if (cls == RateSessionCommand.class) {
+            return (K) new RateSessionCommand(feedbackService);
+        }
         return cls.getDeclaredConstructor().newInstance();
     }
 }
