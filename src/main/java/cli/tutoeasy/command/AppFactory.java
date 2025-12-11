@@ -17,6 +17,7 @@ import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
 import cli.tutoeasy.repository.*;
 import cli.tutoeasy.service.*;
+import lombok.Getter;
 import picocli.CommandLine;
 
 /**
@@ -40,6 +41,7 @@ public class AppFactory implements CommandLine.IFactory {
     /**
      * The repository for managing user data.
      */
+    @Getter
     private final UserRepository userRepository;
     /**
      * The repository for managing tutor data.
@@ -60,6 +62,7 @@ public class AppFactory implements CommandLine.IFactory {
     /**
      * The repository for managing notification data.
      */
+    @Getter
     private final NotificationRepository notificationRepository;
     /**
      * The repository for managing subject data.
@@ -80,14 +83,17 @@ public class AppFactory implements CommandLine.IFactory {
     /**
      * The service for student-related operations.
      */
+    @Getter
     private final StudentService studentService;
     /**
      * The service for administrator-related operations.
      */
+    @Getter
     private final AdministratorService adminService;
     /**
      * The service for tutor-related operations.
      */
+    @Getter
     private final TutorService tutorService;
     /**
      * The service for authentication-related operations.
@@ -96,26 +102,32 @@ public class AppFactory implements CommandLine.IFactory {
     /**
      * The service for contact-related operations.
      */
+    @Getter
     private final ContactService contactService;
     /**
      * The service for message-related operations.
      */
+    @Getter
     private final MessageService messageService;
     /**
      * The service for notification-related operations.
      */
+    @Getter
     private final NotificationService notificationService;
     /**
      * The service for student tutoring-related operations.
      */
+    @Getter
     private final StudentTutoringService studentTutoringService;
     /**
      * The service for profile-related operations.
      */
+    @Getter
     private final ProfileService profileService;
     /**
      * The service for student reportService
      */
+    @Getter
     private final ReportService reportService;
 
     /**

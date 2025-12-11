@@ -46,7 +46,6 @@ import picocli.CommandLine.Command;
         MessageCommand.class,
         StudentRequestCommand.class,
         NotificationCommand.class,
-        StudentHistoryCommand.class,
         ReportCommand.class,
         ProfileCommand.class,
         EditTutorProfileCommand.class,
