@@ -43,7 +43,8 @@ test
 .idea
 tutoeasy-mysql
 Tutoeasy-description.md
-Archivo grupo Tuto-facil.pdf_Zone.Identifier
+"Archivo grupo Tuto-facil.pdf_Zone.Identifier"
+"*.Identifier"
 *.docx
 *.txt
 *.md
