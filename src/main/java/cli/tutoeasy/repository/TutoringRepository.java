@@ -143,7 +143,8 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
      * @return The tutoring session with all details loaded.
      */
     public Tutoring findByIdWithDetails(int tutoringId) {
-        return executeQuery(em -> em.createQuery("""
+        return executeQuery(em -> {
+            var results = em.createQuery("""
                 SELECT t FROM Tutoring t
                 LEFT JOIN FETCH t.student
                 LEFT JOIN FETCH t.tutor
@@ -151,8 +152,10 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
                 LEFT JOIN FETCH t.topic
                 WHERE t.id = :tutoringId
                 """, Tutoring.class)
-                .setParameter("tutoringId", tutoringId)
-                .getSingleResult());
+                    .setParameter("tutoringId", tutoringId)
+                    .getResultList();
+            return results.isEmpty() ? null : results.get(0);
+        });
     }
 
     /**
