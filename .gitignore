@@ -45,6 +45,8 @@ tutoeasy-mysql
 Tutoeasy-description.md
 "Archivo grupo Tuto-facil.pdf_Zone.Identifier"
 "*.Identifier"
+:Zone.Identifier
+:$DATA
 *.docx
 *.txt
 *.md
