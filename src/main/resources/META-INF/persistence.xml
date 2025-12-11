@@ -16,6 +16,7 @@
         <class>cli.tutoeasy.model.entities.TutorSchedule</class>
         <class>cli.tutoeasy.model.entities.Message</class>
         <class>cli.tutoeasy.model.entities.Notification</class>
+        <class>cli.tutoeasy.model.entities.SessionFeedback</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
