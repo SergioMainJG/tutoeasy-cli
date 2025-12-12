@@ -40,6 +40,11 @@ public class AppFactory implements CommandLine.IFactory {
 
     /**
      * The repository for managing user data.
+     * -- GETTER --
+     *  Returns the repository responsible for managing user data.
+     *
+     * @return the {@link UserRepository} instance.
+
      */
     @Getter
     private final UserRepository userRepository;
@@ -49,7 +54,12 @@ public class AppFactory implements CommandLine.IFactory {
     private final TutorRepository tutorRepository;
     /**
      * The repository for managing tutoring data.
+     * -- GETTER --
+     *  Returns the repository responsible for managing tutoring sessions.
+     *
+     * @return the {@link TutoringRepository} instance.
      */
+    @Getter
     private final TutoringRepository tutoringRepository;
     /**
      * The repository for managing contact data.
@@ -61,6 +71,10 @@ public class AppFactory implements CommandLine.IFactory {
     private final MessageRepository messageRepository;
     /**
      * The repository for managing notification data.
+     * -- GETTER --
+     *  Returns the repository responsible for managing notifications.
+     *
+     * @return the {@link NotificationRepository} instance.
      */
     @Getter
     private final NotificationRepository notificationRepository;
@@ -257,4 +271,5 @@ public class AppFactory implements CommandLine.IFactory {
         }
         return cls.getDeclaredConstructor().newInstance();
     }
+
 }

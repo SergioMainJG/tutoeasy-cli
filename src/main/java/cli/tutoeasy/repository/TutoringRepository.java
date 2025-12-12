@@ -295,4 +295,22 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
                 .setParameter("confirmedStatus", TutoringStatus.confirmed)
                 .getResultList());
     }
+    /**
+     * Retrieves a list of unique tutor IDs who have tutoring sessions scheduled
+     * from today onwards.
+     *
+     * <p>This can be used, for example, to send notifications or reminders
+     * only to tutors with upcoming sessions.</p>
+     *
+     * @return a {@link List} of {@link Integer} representing tutor IDs.
+     */
+    public List<Integer> getAllTutorIds() {
+        LocalDate today = LocalDate.now();
+        return executeQuery(em -> em.createQuery("""
+        SELECT DISTINCT t.tutor.id FROM Tutoring t
+        WHERE t.meetingDate >= :today
+        """, Integer.class)
+                .setParameter("today", today)
+                .getResultList());
+    }
 }

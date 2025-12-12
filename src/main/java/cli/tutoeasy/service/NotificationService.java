@@ -1,6 +1,7 @@
 package cli.tutoeasy.service;
 
 import cli.tutoeasy.model.entities.Notification;
+import cli.tutoeasy.model.entities.Tutoring;
 import cli.tutoeasy.model.entities.User;
 import cli.tutoeasy.repository.NotificationRepository;
 import cli.tutoeasy.repository.UserRepository;
@@ -120,5 +121,24 @@ public class NotificationService {
      */
     public int getUnreadCount(int userId) {
         return notificationRepository.findUnreadByUser(userId).size();
+    }
+
+    /**
+     * Notifies the tutor about a specific tutoring session
+     * @param t Tutoring session
+     * @param type Notification type ("tutoring_confirmed", "tutoring_cancelled", "reminder_1day", etc.)
+     */
+    public void notifyTutorForSession(Tutoring t, String type) {
+        if (t == null || t.getTutor() == null) return;
+
+        String message = String.format(
+                "Tutoring session with %s for %s on %s at %s",
+                t.getStudent().getUsername(),
+                t.getSubject().getName(),
+                t.getMeetingDate(),
+                t.getMeetingTime()
+        );
+
+        addNotification(t.getTutor().getId(), message, type);
     }
 }
