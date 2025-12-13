@@ -108,6 +108,9 @@ public class TutorMenu extends BaseMenu {
                     ProfileHandler.handleEditProfile(scanner, factory);
                     break;
                 case 0:
+                    if (scheduler != null) {
+                        scheduler.shutdown();
+                    }
                     return false;
             }
         }

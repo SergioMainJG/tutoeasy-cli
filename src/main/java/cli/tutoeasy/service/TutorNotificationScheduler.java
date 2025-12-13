@@ -24,6 +24,8 @@ public class TutorNotificationScheduler {
 
     private final TutoringRepository tutoringRepository;
     private final NotificationService notificationService;
+    private final ScheduledExecutorService scheduler;
+
 
     /**
      * Constructor that initializes the scheduler and starts periodic execution.
@@ -35,6 +37,8 @@ public class TutorNotificationScheduler {
                                       NotificationService notificationService) {
         this.tutoringRepository = tutoringRepository;
         this.notificationService = notificationService;
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
+
         startScheduler();
     }
 
@@ -43,8 +47,18 @@ public class TutorNotificationScheduler {
      * {@link #checkUpcomingSessions()} every minute.
      */
     private void startScheduler() {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(this::checkUpcomingSessions, 0, 1, TimeUnit.MINUTES);
+    }
+    /**
+     * Stops the notification scheduler immediately.
+     * <p>
+     * This method shuts down the internal {@link ScheduledExecutorService}
+     * to stop sending automatic tutoring reminders.
+     * It should be called when the tutor logs out to prevent background threads
+     * from keeping the application alive.
+     */
+    public void shutdown() {
+        scheduler.shutdownNow(); // Stops all scheduled tasks immediately
     }
 
     /**
