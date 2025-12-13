@@ -187,7 +187,7 @@ public class AppFactory implements CommandLine.IFactory {
         this.reportRepository = new ReportRepository();
         this.authService = new AuthService(userRepository);
         this.studentService = new StudentService(userRepository);
-        this.adminService = new AdministratorService(userRepository);
+        this.adminService = new AdministratorService(userRepository, tutoringRepository);
         this.contactService = new ContactService(contactRepository, tutoringRepository);
         this.messageService = new MessageService(messageRepository, contactRepository, notificationRepository);
         this.notificationService = new NotificationService(notificationRepository, userRepository);

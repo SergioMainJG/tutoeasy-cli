@@ -3,6 +3,8 @@ package cli.tutoeasy.ui.handlers;
 
 import cli.tutoeasy.command.AppFactory;
 import cli.tutoeasy.model.dto.CreateAdministratorDto;
+import cli.tutoeasy.model.entities.Tutoring;
+import cli.tutoeasy.model.entities.TutoringStatus;
 import cli.tutoeasy.service.AdministratorService;
 import cli.tutoeasy.util.input.SecurePasswordReader;
 import cli.tutoeasy.util.validations.CommonValidation;
@@ -150,5 +152,83 @@ public class AdminHandler {
                 System.out.println();
             }
         }
+    }
+
+    /**
+     * <p>Displays a list of tutoring sessions filtered by student, tutor, subject, or status.</p>
+     *
+     * <p>This method interacts with the user via the console:</p>
+     * <ul>
+     *     <li>Prompts for optional filter values: student name, tutor name, subject name, and tutoring status.</li>
+     *     <li>If the user enters a status, it must be one of: unconfirmed, confirmed, canceled, completed.</li>
+     *     <li>If an invalid status is entered, an error message is displayed and the method returns.</li>
+     * </ul>
+     *
+     * <p>After collecting filters, the method calls the {@link cli.tutoeasy.service.AdministratorService#getFilteredTutoringsByName}
+     * to retrieve matching tutoring sessions and prints them in a formatted way to the console.</p>
+     *
+     * <p>If no tutorings match the filters, a message is displayed indicating no results.</p>
+     *
+     * @param scanner Scanner used to read user input from the console.
+     * @param factory AppFactory used to access the {@link cli.tutoeasy.service.AdministratorService}.
+     */
+    public static void showAllTutorings(Scanner scanner, AppFactory factory) {
+        System.out.println("╔════════════════════════════════════════════════════════════╗");
+        System.out.println("║                VIEW TUTORINGS (WITH FILTERS)              ║");
+        System.out.println("╚════════════════════════════════════════════════════════════╝\n");
+
+        System.out.println("Enter filter values or leave blank to skip:\n");
+
+        System.out.print("Student name (leave blank to skip): ");
+        String studentName = scanner.nextLine().trim();
+
+        System.out.print("Tutor name (leave blank to skip): ");
+        String tutorName = scanner.nextLine().trim();
+
+        System.out.print("Subject name (leave blank to skip): ");
+        String subjectName = scanner.nextLine().trim();
+
+        System.out.print("Status (unconfirmed, confirmed, canceled, completed): ");
+        String statusInput = scanner.nextLine().trim();
+        TutoringStatus status = null;
+        if (!statusInput.isEmpty()) {
+            try {
+                status = TutoringStatus.valueOf(statusInput.toLowerCase());
+            } catch (IllegalArgumentException e) {
+                System.out.println("\n Error: Invalid status. Valid values: unconfirmed, confirmed, canceled, completed");
+                System.out.println("\nPress Enter to continue...");
+                scanner.nextLine();
+                return;
+            }
+        }
+        var tutorings = factory.getAdminService().getFilteredTutoringsByName(studentName, tutorName, subjectName, status);
+
+        if (tutorings.isEmpty()) {
+            System.out.println("\nNo tutorings found for the given filters.");
+        } else {
+            for (var t : tutorings) {
+                System.out.println("""
+            ---------------------------
+            Date: %s %s
+            Student: %s
+            Tutor: %s
+            Subject: %s
+            Topic: %s
+            Status: %s
+            ---------------------------
+            """.formatted(
+                        t.getMeetingDate(),
+                        t.getMeetingTime(),
+                        t.getStudent().getUsername(),
+                        t.getTutor().getUsername(),
+                        t.getSubject().getName(),
+                        t.getTopic() != null ? t.getTopic().getName() : "N/A",
+                        t.getStatus()
+                ));
+            }
+        }
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 }
