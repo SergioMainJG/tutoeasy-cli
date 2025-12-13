@@ -2,6 +2,8 @@ package cli.tutoeasy.ui.menus;
 
 import cli.tutoeasy.command.AppFactory;
 import cli.tutoeasy.config.session.AuthSession;
+import cli.tutoeasy.service.NotificationService;
+import cli.tutoeasy.service.TutorNotificationScheduler;
 import cli.tutoeasy.ui.handlers.*;
 
 import java.util.Scanner;
@@ -17,6 +19,7 @@ import java.util.Scanner;
  * </ul>
  */
 public class TutorMenu extends BaseMenu {
+    private TutorNotificationScheduler scheduler;
 
     /**
      * <p>Constructs a new TutorMenu instance.</p>
@@ -35,6 +38,26 @@ public class TutorMenu extends BaseMenu {
      */
     @Override
     public boolean show() {
+        /*
+         * Initializes the notification scheduler for the tutor.
+         * This is done only the first time the menu is accessed to avoid multiple schedulers.
+         * - A NotificationService is created using repositories from AppFactory.
+         * - The tutoring repository and the NotificationService are passed to the TutorNotificationScheduler.
+         * This allows automatic notifications (tutoring reminders)
+         * to be sent while the tutor is using the menu, without duplicating threads.
+         */
+        if (scheduler == null) {
+            NotificationService notificationService = new NotificationService(
+                    factory.getNotificationRepository(),
+                    factory.getUserRepository()
+            );
+            scheduler = new TutorNotificationScheduler(
+                    factory.getTutoringRepository(),
+                    notificationService
+            );
+        }
+
+
         while (true) {
             displayHeader("TUTOR MENU - " + AuthSession.getCurrentUser().getUsername());
 
@@ -85,6 +108,9 @@ public class TutorMenu extends BaseMenu {
                     ProfileHandler.handleEditProfile(scanner, factory);
                     break;
                 case 0:
+                    if (scheduler != null) {
+                        scheduler.shutdown();
+                    }
                     return false;
             }
         }
