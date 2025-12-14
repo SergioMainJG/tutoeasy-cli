@@ -214,49 +214,53 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
     }
 
     /**
-     * Finds tutoring history for a student (past sessions that are completed or canceled).
-     * Results are ordered by meeting date descending (most recent first).
+     * Retrieves past tutoring sessions for a student (completed, canceled, or confirmed but in the past).
+     * Supports optional limit, status filter, and subject filter. Results are ordered newest first.
      *
      * @param studentId ID of the student
-     * @param limit Optional limit on number of results (null = no limit)
-     * @param statusFilter Optional status filter ("completed" or "canceled", null = both)
-     * @param subjectFilter Optional subject name filter (null = all subjects)
-     * @return List of past tutoring sessions
+     * @param limit Optional max number of results (null = no limit)
+     * @param statusFilter Optional status ("completed" or "canceled"), null = all
+     * @param subjectFilter Optional subject name, null = all
+     * @return List of {@link Tutoring} matching the criteria
      */
     public List<Tutoring> findHistoryByStudent(int studentId, Integer limit, String statusFilter, String subjectFilter) {
         LocalDate today = LocalDate.now();
 
         return executeQuery(em -> {
             StringBuilder jpql = new StringBuilder("""
-                SELECT t FROM Tutoring t
-                LEFT JOIN FETCH t.student
-                LEFT JOIN FETCH t.tutor
-                LEFT JOIN FETCH t.subject
-                LEFT JOIN FETCH t.topic
-                WHERE t.student.id = :studentId
-                AND t.meetingDate < :today
-                AND (t.status = :completedStatus OR t.status = :canceledStatus)
-                """);
+            SELECT t FROM Tutoring t
+            LEFT JOIN FETCH t.student
+            LEFT JOIN FETCH t.tutor
+            LEFT JOIN FETCH t.subject
+            LEFT JOIN FETCH t.topic
+            WHERE t.student.id = :studentId
+            AND (
+                t.status = :completedStatus
+                OR t.status = :canceledStatus
+                OR (t.status = :confirmedStatus AND t.meetingDate < :today)
+            )
+        """);
 
             if (statusFilter != null) {
                 if (statusFilter.equalsIgnoreCase("completed")) {
-                    jpql.append("AND t.status = :completedStatus ");
+                    jpql.append(" AND (t.status = :completedStatus OR (t.status = :confirmedStatus AND t.meetingDate < :today)) ");
                 } else if (statusFilter.equalsIgnoreCase("canceled")) {
-                    jpql.append("AND t.status = :canceledStatus ");
+                    jpql.append(" AND t.status = :canceledStatus ");
                 }
             }
 
             if (subjectFilter != null && !subjectFilter.trim().isEmpty()) {
-                jpql.append("AND LOWER(t.subject.name) = LOWER(:subjectName) ");
+                jpql.append(" AND LOWER(t.subject.name) = LOWER(:subjectName) ");
             }
 
-            jpql.append("ORDER BY t.meetingDate DESC, t.meetingTime DESC");
+            jpql.append(" ORDER BY t.meetingDate DESC, t.meetingTime DESC");
 
             var query = em.createQuery(jpql.toString(), Tutoring.class)
                     .setParameter("studentId", studentId)
-                    .setParameter("today", today)
                     .setParameter("completedStatus", TutoringStatus.completed)
-                    .setParameter("canceledStatus", TutoringStatus.canceled);
+                    .setParameter("canceledStatus", TutoringStatus.canceled)
+                    .setParameter("confirmedStatus", TutoringStatus.confirmed)
+                    .setParameter("today", today);
 
             if (subjectFilter != null && !subjectFilter.trim().isEmpty()) {
                 query.setParameter("subjectName", subjectFilter.trim());
@@ -362,6 +366,28 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
 
             return query.getResultList();
         });
+    }
+    /**
+     * Returns the completed tutoring sessions for a given tutor.
+     * Loads student, tutor, subject, and topic. Ordered by date and time descending.
+     *
+     * @param tutorId ID of the tutor
+     * @return List of completed {@link Tutoring} sessions
+     */
+    public List<Tutoring> findCompletedByTutor(int tutorId) {
+        return executeQuery(em -> em.createQuery("""
+        SELECT t FROM Tutoring t
+        LEFT JOIN FETCH t.student
+        LEFT JOIN FETCH t.tutor
+        LEFT JOIN FETCH t.subject
+        LEFT JOIN FETCH t.topic
+        WHERE t.tutor.id = :tutorId
+        AND t.status = :completedStatus
+        ORDER BY t.meetingDate DESC, t.meetingTime DESC
+        """, Tutoring.class)
+                .setParameter("tutorId", tutorId)
+                .setParameter("completedStatus", TutoringStatus.completed)
+                .getResultList());
     }
 
 }
