@@ -313,4 +313,55 @@ public class TutoringRepository extends BaseRepository<Tutoring> {
                 .setParameter("today", today)
                 .getResultList());
     }
+
+    /**
+     * Retrieves a list of tutorings filtered by student name, tutor name, subject, and status.
+     * <p>Any filter can be null or empty to ignore that criteria.</p>
+     *
+     * @param studentName optional student username filter (null or empty to ignore)
+     * @param tutorName optional tutor username filter (null or empty to ignore)
+     * @param subjectName optional subject name filter (null or empty to ignore)
+     * @param status optional tutoring status filter (null to ignore)
+     * @return a list of {@link Tutoring} objects matching the given filters
+     */
+    public List<Tutoring> findAllFiltered(
+            String studentName,
+            String tutorName,
+            String subjectName,
+            TutoringStatus status
+    ) {
+        return executeQuery(em -> {
+            StringBuilder jpql = new StringBuilder("""
+            SELECT t FROM Tutoring t
+            LEFT JOIN FETCH t.student
+            LEFT JOIN FETCH t.tutor
+            LEFT JOIN FETCH t.subject
+            LEFT JOIN FETCH t.topic
+            WHERE 1=1
+        """);
+
+            if (studentName != null && !studentName.isEmpty()) {
+                jpql.append(" AND LOWER(t.student.username) LIKE LOWER(CONCAT('%', :studentName, '%'))");
+            }
+            if (tutorName != null && !tutorName.isEmpty()) {
+                jpql.append(" AND LOWER(t.tutor.username) LIKE LOWER(CONCAT('%', :tutorName, '%'))");
+            }
+            if (subjectName != null && !subjectName.isEmpty()) {
+                jpql.append(" AND LOWER(t.subject.name) LIKE LOWER(CONCAT('%', :subjectName, '%'))");
+            }
+            if (status != null) {
+                jpql.append(" AND t.status = :status");
+            }
+
+            var query = em.createQuery(jpql.toString(), Tutoring.class);
+
+            if (studentName != null && !studentName.isEmpty()) query.setParameter("studentName", studentName);
+            if (tutorName != null && !tutorName.isEmpty()) query.setParameter("tutorName", tutorName);
+            if (subjectName != null && !subjectName.isEmpty()) query.setParameter("subjectName", subjectName);
+            if (status != null) query.setParameter("status", status);
+
+            return query.getResultList();
+        });
+    }
+
 }

@@ -42,20 +42,21 @@ public class AdminMenu extends BaseMenu {
             System.out.println("MANAGEMENT");
             System.out.println("  1. Create new administrator");
             System.out.println("  2. Manage reports");
+            System.out.println("  3. View all tutorings");
             System.out.println();
             System.out.println("COMMUNICATION");
-            System.out.println("  3. View notifications");
-            System.out.println("  4. View messages");
-            System.out.println("  5. Send message");
+            System.out.println("  4. View notifications");
+            System.out.println("  5. View messages");
+            System.out.println("  6. Send message");
             System.out.println();
             System.out.println("PROFILE");
-            System.out.println("  6. View contact information");
-            System.out.println("  7. Edit profile");
+            System.out.println("  7. View contact information");
+            System.out.println("  8. Edit profile");
             System.out.println();
             System.out.println("0. Logout");
             System.out.println();
 
-            int option = readIntInput("Select an option: ", 0, 7);
+            int option = readIntInput("Select an option: ", 0, 8);
 
             switch (option) {
                 case 1:
@@ -65,24 +66,27 @@ public class AdminMenu extends BaseMenu {
                     ReportHandler.handleReports(scanner, factory);
                     break;
                 case 3:
-                    NotificationHandler.handleViewNotifications(scanner, factory);
+                    AdminHandler.showAllTutorings(scanner, factory);
                     break;
                 case 4:
-                    MessageHandler.handleViewMessages(scanner, factory);
+                    NotificationHandler.handleViewNotifications(scanner, factory);
                     break;
                 case 5:
-                    MessageHandler.handleSendMessage(scanner, factory);
+                    MessageHandler.handleViewMessages(scanner, factory);
                     break;
                 case 6:
-                    ContactHandler.handleViewContact(scanner, factory);
+                    MessageHandler.handleSendMessage(scanner, factory);
                     break;
                 case 7:
+                    ContactHandler.handleViewContact(scanner, factory);
+                    break;
+                case 8:
                     ProfileHandler.handleEditProfile(scanner, factory);
                     break;
                 case 0:
                     return false;
                 default:
-                    showError("Invalid option. Please select an option between 0 and 7.");
+                    showError("Invalid option. Please select an option between 0 and 8.");
                     waitForEnter();
             }
         }
