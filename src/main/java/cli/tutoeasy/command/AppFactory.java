@@ -166,6 +166,15 @@ public class AppFactory implements CommandLine.IFactory {
     private final SessionFeedbackService feedbackService;
 
     /**
+     * Returns the service responsible for handling tutoring session feedback.
+     *
+     * @return the {@link SessionFeedbackService} instance
+     */
+    public SessionFeedbackService getSessionFeedbackService() {
+        return feedbackService;
+    }
+
+    /**
      * <p>
      * Constructs a new instance of the {@code AppFactory}.
      * </p>

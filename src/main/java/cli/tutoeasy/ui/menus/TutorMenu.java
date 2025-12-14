@@ -77,10 +77,13 @@ public class TutorMenu extends BaseMenu {
             System.out.println("  7. View contact information");
             System.out.println("  8. Edit profile");
             System.out.println();
+            System.out.println("TUTORING MANAGEMENT");
+            System.out.println("  9. Rate a student");
+            System.out.println();
             System.out.println("0. Logout");
             System.out.println();
 
-            int option = readIntInput("Select an option: ", 0, 8);
+            int option = readIntInput("Select an option: ", 0, 9);
 
             switch (option) {
                 case 1:
@@ -106,6 +109,9 @@ public class TutorMenu extends BaseMenu {
                     break;
                 case 8:
                     ProfileHandler.handleEditProfile(scanner, factory);
+                    break;
+                case 9:
+                    TutorRatingHandler.handleRateStudent(scanner, factory);
                     break;
                 case 0:
                     if (scheduler != null) {

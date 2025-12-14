@@ -41,20 +41,21 @@ public class StudentMenu extends BaseMenu {
             System.out.println("  1. Request tutoring");
             System.out.println("  2. View upcoming sessions");
             System.out.println("  3. View tutoring history");
+            System.out.println("  4. Rate completed tutoring");
             System.out.println();
             System.out.println("COMMUNICATION");
-            System.out.println("  4. View notifications");
-            System.out.println("  5. View messages");
-            System.out.println("  6. Send message");
+            System.out.println("  5. View notifications");
+            System.out.println("  6. View messages");
+            System.out.println("  7. Send message");
             System.out.println();
             System.out.println("PROFILE");
-            System.out.println("  7. View contact information");
-            System.out.println("  8. Edit profile");
+            System.out.println("  8. View contact information");
+            System.out.println("  9. Edit profile");
             System.out.println();
             System.out.println("0. Logout");
             System.out.println();
 
-            int option = readIntInput("Select an option: ", 0, 8);
+            int option = readIntInput("Select an option: ", 0, 9);
 
             switch (option) {
                 case 1:
@@ -67,18 +68,21 @@ public class StudentMenu extends BaseMenu {
                     TutoringHandler.handleViewHistory(scanner, factory);
                     break;
                 case 4:
-                    NotificationHandler.handleViewNotifications(scanner, factory);
+                    StudentRatingHandler.handleRateTutor(scanner, factory);
                     break;
                 case 5:
-                    MessageHandler.handleViewMessages(scanner, factory);
+                    NotificationHandler.handleViewNotifications(scanner, factory);
                     break;
                 case 6:
-                    MessageHandler.handleSendMessage(scanner, factory);
+                    MessageHandler.handleViewMessages(scanner, factory);
                     break;
                 case 7:
-                    ContactHandler.handleViewContact(scanner, factory);
+                    MessageHandler.handleSendMessage(scanner, factory);
                     break;
                 case 8:
+                    ContactHandler.handleViewContact(scanner, factory);
+                    break;
+                case 9:
                     ProfileHandler.handleEditProfile(scanner, factory);
                     break;
                 case 0:
