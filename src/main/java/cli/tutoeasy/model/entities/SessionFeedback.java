@@ -47,7 +47,7 @@ import java.time.LocalDateTime;
 @Table(
         name = "SessionFeedback",
         uniqueConstraints = @UniqueConstraint(
-                columnNames = {"tutoringId", "tutorObservation"}
+                columnNames = {"tutoringId", "isTutorObservation"}
         )
 )
 @Getter
@@ -107,5 +107,5 @@ public class SessionFeedback {
      * </ul>
      */
     @Column(nullable = false)
-    private boolean tutorObservation = false;
+    private boolean isTutorObservation = false;
 }

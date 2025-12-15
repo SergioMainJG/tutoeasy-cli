@@ -56,7 +56,7 @@ public class SessionFeedbackRepository extends BaseRepository<SessionFeedback> {
                 SELECT COUNT(f)
                 FROM SessionFeedback f
                 WHERE f.tutoringId = :tutoringId
-                AND f.tutorObservation = false
+                AND f.isTutorObservation = false
                 """, Long.class)
                     .setParameter("tutoringId", tutoringId)
                     .getSingleResult();
@@ -81,7 +81,7 @@ public class SessionFeedbackRepository extends BaseRepository<SessionFeedback> {
                 SELECT COUNT(f)
                 FROM SessionFeedback f
                 WHERE f.tutoringId = :tutoringId
-                AND f.tutorObservation = true
+                AND f.isTutorObservation = true
                 """, Long.class)
                     .setParameter("tutoringId", tutoringId)
                     .getSingleResult();
