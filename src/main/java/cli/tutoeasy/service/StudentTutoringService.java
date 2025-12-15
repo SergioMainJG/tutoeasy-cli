@@ -350,4 +350,36 @@ public class StudentTutoringService {
                         t.getStatus().name()))
                 .collect(Collectors.toList());
     }
+
+    /**
+     * <p>Retrieves all completed tutoring sessions for a student.</p>
+     * <p>This includes sessions that are either completed or confirmed
+     * but whose meeting date/time has already passed.</p>
+     *
+     * @param studentId ID of the student
+     * @return List of {@link StudentTutoringHistoryDto} representing completed sessions
+     */
+    public List<StudentTutoringHistoryDto> getCompletedTutorings(int studentId) {
+        List<Tutoring> completed = tutoringRepository.findHistoryByStudent(
+                        studentId,
+                        null,
+                        null, // no aplicar filtro de estado exacto
+                        null
+                ).stream()
+                .filter(t -> t.getStatus() == TutoringStatus.completed ||
+                        (t.getStatus() == TutoringStatus.confirmed &&
+                                LocalDateTime.of(t.getMeetingDate(), t.getMeetingTime()).isBefore(LocalDateTime.now())))
+                .collect(Collectors.toList());
+
+        return completed.stream()
+                .map(t -> new StudentTutoringHistoryDto(
+                        t.getId(),
+                        t.getTutor().getUsername(),
+                        t.getSubject().getName(),
+                        t.getTopic() != null ? t.getTopic().getName() : null,
+                        t.getMeetingDate(),
+                        t.getMeetingTime(),
+                        t.getStatus().name()))
+                .collect(Collectors.toList());
+    }
 }

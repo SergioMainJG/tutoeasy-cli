@@ -8,10 +8,12 @@ import cli.tutoeasy.command.global.NotificationCommand;
 import cli.tutoeasy.command.global.ProfileCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.session.LogoutCommand;
+import cli.tutoeasy.command.student.RateSessionCommand;
 import cli.tutoeasy.command.student.StudentCommand;
 import cli.tutoeasy.command.student.StudentHistoryCommand;
 import cli.tutoeasy.command.student.StudentRequestCommand;
 import cli.tutoeasy.command.tutor.EditTutorProfileCommand;
+import cli.tutoeasy.command.tutor.RateStudentCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
 import cli.tutoeasy.config.session.AuthSession;
@@ -44,12 +46,11 @@ import picocli.CommandLine.Command;
         MessageCommand.class,
         StudentRequestCommand.class,
         NotificationCommand.class,
-        StudentHistoryCommand.class,
         ReportCommand.class,
-        StudentHistoryCommand.class,
         ProfileCommand.class,
-        StudentHistoryCommand.class,
-        EditTutorProfileCommand.class
+        EditTutorProfileCommand.class,
+        RateSessionCommand.class,
+        RateStudentCommand.class
 }, mixinStandardHelpOptions = true)
 public class RootCommand implements Runnable {
     /**

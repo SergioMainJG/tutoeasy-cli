@@ -513,4 +513,34 @@ public class TutorService {
             default -> throw new IllegalArgumentException("Invalid day: " + day);
         };
     }
+    /**
+     * Retrieves all completed tutoring sessions for a given tutor.
+     *
+     * <p>This method fetches sessions marked as completed for the specified tutor
+     * and maps them to a list of {@link TutorTutoringRequestDto}.</p>
+     *
+     * @param tutorId the ID of the tutor
+     * @return a list of completed tutoring session DTOs
+     * @throws IllegalArgumentException if the user is not found or not a tutor
+     */
+    public List<TutorTutoringRequestDto> getCompletedTutorings(int tutorId) {
+        var tutor = tutorRepository.findById(tutorId);
+        if (tutor == null) {
+            throw new IllegalArgumentException("User is not a tutor.");
+        }
+
+        List<Tutoring> sessions = tutoringRepository.findCompletedByTutor(tutorId);
+
+        return sessions.stream()
+                .map(t -> new TutorTutoringRequestDto(
+                        t.getId(),
+                        t.getStudent().getId(),
+                        t.getStudent().getUsername(),
+                        t.getSubject().getName(),
+                        t.getTopic() != null ? t.getTopic().getName() : "No topic",
+                        t.getMeetingDate(),
+                        t.getMeetingTime()
+                ))
+                .toList();
+    }
 }

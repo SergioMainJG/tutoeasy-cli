@@ -58,7 +58,7 @@ public class JPAUtil {
                         factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, envProps);
 
                         long endTime = System.currentTimeMillis();
-                        System.out.println("Service initialized in " + (endTime - startTime) + "ms");
+                        //System.out.println("Service initialized in " + (endTime - startTime) + "ms");
                     } catch (Exception ex) {
                         System.err.println("Error initializing EntityManagerFactory: " + ex.getMessage());
                         throw new ExceptionInInitializerError(ex);

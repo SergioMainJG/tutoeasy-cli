@@ -7,6 +7,13 @@ import cli.tutoeasy.model.entities.User;
 import cli.tutoeasy.model.entities.UserRole;
 import cli.tutoeasy.repository.UserRepository;
 
+import cli.tutoeasy.config.session.AuthSession;
+import cli.tutoeasy.model.entities.Tutoring;
+import cli.tutoeasy.model.entities.TutoringStatus;
+import cli.tutoeasy.repository.TutoringRepository;
+
+import java.util.List;
+
 /**
  * Service class for handling administrator-related operations.
  * This class provides methods for creating, retrieving, updating, and deleting administrators.
@@ -22,13 +29,17 @@ public class AdministratorService {
      */
     private final UserRepository repo;
 
+    private final TutoringRepository tutoringRepository;
+
     /**
      * Constructs a new instance of the {@code AdministratorService}.
      *
      * @param repo The repository for managing user data.
+     * @param tutoringRepository the repository for managing tutorings
      */
-    public AdministratorService(UserRepository repo) {
+    public AdministratorService(UserRepository repo, TutoringRepository tutoringRepository) {
         this.repo = repo;
+        this.tutoringRepository = tutoringRepository;
     }
 
     /**
@@ -82,4 +93,27 @@ public class AdministratorService {
     public void deleteAdmin(int id) {
         repo.delete(id);
     }
+
+    /**
+     * Retrieves a list of tutorings filtered by student name, tutor name, subject, and status.
+     * <p>Requires administrator role; throws {@link IllegalStateException} if the current user is not an admin.</p>
+     *
+     * @param studentName optional student username filter (can be null or empty)
+     * @param tutorName optional tutor username filter (can be null or empty)
+     * @param subjectName optional subject name filter (can be null or empty)
+     * @param status optional tutoring status filter (can be null)
+     * @return a list of {@link Tutoring} objects matching the given filters
+     */
+    public List<Tutoring> getFilteredTutoringsByName(
+            String studentName,
+            String tutorName,
+            String subjectName,
+            TutoringStatus status
+    ) {
+        if (!AuthSession.hasRole(UserRole.admin.name())) {
+            throw new IllegalStateException("Access denied. Administrator role required.");
+        }
+        return tutoringRepository.findAllFiltered(studentName, tutorName, subjectName, status);
+    }
+
 }

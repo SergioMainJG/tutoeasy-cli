@@ -4,6 +4,7 @@ package cli.tutoeasy;
 import cli.tutoeasy.command.*;
 import cli.tutoeasy.config.hibernate.JPAUtil;
 import cli.tutoeasy.config.session.AuthSession;
+import cli.tutoeasy.ui.InteractiveMenuManager;
 import picocli.CommandLine;
 
 /**
@@ -28,23 +29,26 @@ public class Main {
                 ClassLoader.getSystemResource("logging.properties").getPath());
 
         JPAUtil.getEntityManager();
-        var sessionResult = AuthSession.initialize();
 
         if (args.length == 0) {
-            if (sessionResult.success()) {
-                String msg = CommandLine.Help.Ansi.AUTO.string(
-                        "@|green " + sessionResult.message() + "|@"
-                );
-                System.out.println(msg);
-            } else {
-                String msg = CommandLine.Help.Ansi.AUTO.string(
-                        "@|yellow No active session. Use 'Login' to authenticate.|@"
-                );
-                System.out.println(msg);
-                System.out.println("Use --help to see available commands.");
-            }
-            System.exit(0);
+            InteractiveMenuManager menuManager = new InteractiveMenuManager();
+            menuManager.start();
             return;
+        }
+
+        var sessionResult = AuthSession.initialize();
+
+        if (sessionResult.success()) {
+            String msg = CommandLine.Help.Ansi.AUTO.string(
+                    "@|green " + sessionResult.message() + "|@"
+            );
+            System.out.println(msg);
+        } else {
+            String msg = CommandLine.Help.Ansi.AUTO.string(
+                    "@|yellow No active session. Use 'Login' to authenticate.|@"
+            );
+            System.out.println(msg);
+            System.out.println("Use --help to see available commands.");
         }
 
         AppFactory factory = new AppFactory();

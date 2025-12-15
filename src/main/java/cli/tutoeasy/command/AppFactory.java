@@ -8,13 +8,16 @@ import cli.tutoeasy.command.global.NotificationCommand;
 import cli.tutoeasy.command.global.ProfileCommand;
 import cli.tutoeasy.command.session.LoginCommand;
 import cli.tutoeasy.command.student.StudentCommand;
+import cli.tutoeasy.command.student.RateSessionCommand;
 import cli.tutoeasy.command.student.StudentHistoryCommand;
 import cli.tutoeasy.command.student.StudentRequestCommand;
 import cli.tutoeasy.command.tutor.EditTutorProfileCommand;
+import cli.tutoeasy.command.tutor.RateStudentCommand;
 import cli.tutoeasy.command.tutor.TutorCommand;
 import cli.tutoeasy.command.tutor.TutorRequestCommand;
 import cli.tutoeasy.repository.*;
 import cli.tutoeasy.service.*;
+import lombok.Getter;
 import picocli.CommandLine;
 
 /**
@@ -37,7 +40,13 @@ public class AppFactory implements CommandLine.IFactory {
 
     /**
      * The repository for managing user data.
+     * -- GETTER --
+     *  Returns the repository responsible for managing user data.
+     *
+     * @return the {@link UserRepository} instance.
+
      */
+    @Getter
     private final UserRepository userRepository;
     /**
      * The repository for managing tutor data.
@@ -45,7 +54,12 @@ public class AppFactory implements CommandLine.IFactory {
     private final TutorRepository tutorRepository;
     /**
      * The repository for managing tutoring data.
+     * -- GETTER --
+     *  Returns the repository responsible for managing tutoring sessions.
+     *
+     * @return the {@link TutoringRepository} instance.
      */
+    @Getter
     private final TutoringRepository tutoringRepository;
     /**
      * The repository for managing contact data.
@@ -57,7 +71,12 @@ public class AppFactory implements CommandLine.IFactory {
     private final MessageRepository messageRepository;
     /**
      * The repository for managing notification data.
+     * -- GETTER --
+     *  Returns the repository responsible for managing notifications.
+     *
+     * @return the {@link NotificationRepository} instance.
      */
+    @Getter
     private final NotificationRepository notificationRepository;
     /**
      * The repository for managing subject data.
@@ -78,14 +97,17 @@ public class AppFactory implements CommandLine.IFactory {
     /**
      * The service for student-related operations.
      */
+    @Getter
     private final StudentService studentService;
     /**
      * The service for administrator-related operations.
      */
+    @Getter
     private final AdministratorService adminService;
     /**
      * The service for tutor-related operations.
      */
+    @Getter
     private final TutorService tutorService;
     /**
      * The service for authentication-related operations.
@@ -94,26 +116,32 @@ public class AppFactory implements CommandLine.IFactory {
     /**
      * The service for contact-related operations.
      */
+    @Getter
     private final ContactService contactService;
     /**
      * The service for message-related operations.
      */
+    @Getter
     private final MessageService messageService;
     /**
      * The service for notification-related operations.
      */
+    @Getter
     private final NotificationService notificationService;
     /**
      * The service for student tutoring-related operations.
      */
+    @Getter
     private final StudentTutoringService studentTutoringService;
     /**
      * The service for profile-related operations.
      */
+    @Getter
     private final ProfileService profileService;
     /**
      * The service for student reportService
      */
+    @Getter
     private final ReportService reportService;
 
     /**
@@ -125,6 +153,27 @@ public class AppFactory implements CommandLine.IFactory {
      * The repository for managing tutors' schedule data.
      */
     private final TutorScheduleRepository scheduleRepository;
+
+    /**
+     * Repository responsible for managing tutoring session feedback persistence.
+     */
+    private final SessionFeedbackRepository feedbackRepository;
+
+    /**
+     * Service responsible for handling business logic related to
+     * tutoring session feedback.
+     */
+    private final SessionFeedbackService feedbackService;
+
+    /**
+     * Returns the service responsible for handling tutoring session feedback.
+     *
+     * @return the {@link SessionFeedbackService} instance
+     */
+    public SessionFeedbackService getSessionFeedbackService() {
+        return feedbackService;
+    }
+
     /**
      * <p>
      * Constructs a new instance of the {@code AppFactory}.
@@ -147,7 +196,7 @@ public class AppFactory implements CommandLine.IFactory {
         this.reportRepository = new ReportRepository();
         this.authService = new AuthService(userRepository);
         this.studentService = new StudentService(userRepository);
-        this.adminService = new AdministratorService(userRepository);
+        this.adminService = new AdministratorService(userRepository, tutoringRepository);
         this.contactService = new ContactService(contactRepository, tutoringRepository);
         this.messageService = new MessageService(messageRepository, contactRepository, notificationRepository);
         this.notificationService = new NotificationService(notificationRepository, userRepository);
@@ -157,6 +206,8 @@ public class AppFactory implements CommandLine.IFactory {
         this.studentTutoringService = new StudentTutoringService(tutoringRepository, userRepository, subjectRepository, contactRepository, notificationService, topicRepository);
         this.profileService = new ProfileService(userRepository, careerRepository);
         this.reportService = new ReportService(reportRepository, userRepository);
+        this.feedbackRepository = new SessionFeedbackRepository();
+        this.feedbackService = new SessionFeedbackService( feedbackRepository, tutoringRepository);
     }
 
     /**
@@ -215,7 +266,19 @@ public class AppFactory implements CommandLine.IFactory {
         if (cls == EditTutorProfileCommand.class){
             return (K) new EditTutorProfileCommand(tutorService);
         }
-
+        if (cls == ReportCommand.class) {
+            return (K) new ReportCommand(reportService);
+        }
+        if (cls == ProfileCommand.class) {
+            return (K) new ProfileCommand(profileService);
+        }
+        if (cls == RateStudentCommand.class) {
+            return (K) new RateStudentCommand(feedbackService);
+        }
+        if (cls == RateSessionCommand.class) {
+            return (K) new RateSessionCommand(feedbackService);
+        }
         return cls.getDeclaredConstructor().newInstance();
     }
+
 }
